@@ -29,7 +29,39 @@ public class TLValidationJobController {
     @RequestMapping(value = "/ready", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     @ResponseBody
     public Boolean isReady() {
-        return job.getSummary() != null;
+        TLValidationJobSummary summary = job.getSummary();
+        List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
+        if (!isProcessed(lotlInfos)) {
+            return false;
+        }
+        for (LOTLInfo lotlInfo : lotlInfos) {
+            if (!isProcessed(lotlInfo.getPivotInfos())) {
+                return false;
+            }
+            if (!isProcessed(lotlInfo.getTLInfos())) {
+                return false;
+            }
+        }
+        if (!isProcessed(summary.getOtherTLInfos())) {
+            return false;
+        }
+        return true;
+    }
+
+    private <T extends TLInfo> boolean isProcessed(List<T> tlInfos) {
+        for (T tlInfo : tlInfos) {
+            if (!isProcessed(tlInfo.getDownloadCacheInfo())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isProcessed(InfoRecord record) {
+        // REFRESH_NEEDED on download task means the refresh() method has not been called yet
+        // DESYNCHRONIZED on download means the job has been interrupted in the middle and is not finished
+        // SYNCHRONIZED, ERROR, TO_BE_DELETED represent the final task cache states
+        return record.isSynchronized() || record.isError() || record.isToBeDeleted();
     }
 
     /**
@@ -107,7 +139,8 @@ public class TLValidationJobController {
     }
 
     private boolean isSynchronized(InfoRecord record) {
-        return record.isSynchronized();
+        // TO_BE_DELETED indicated that a URL of a TL has been changed, but not an error
+        return record.isSynchronized() || record.isToBeDeleted();
     }
 
 }
