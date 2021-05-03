@@ -33,6 +33,42 @@ public class TLValidationJobController {
     }
 
     /**
+     * This method verifies if all LOTL/TLs are available and have been downloaded successfully
+     *
+     * @return TRUE if all LOTL/TLs are available, FALSE otherwise
+     */
+    @RequestMapping(value = "/tls-available", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    @ResponseBody
+    public Boolean areTLsAvailable() {
+        TLValidationJobSummary summary = job.getSummary();
+        List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
+        if (!isAvailable(lotlInfos)) {
+            return false;
+        }
+        for (LOTLInfo lotlInfo : lotlInfos) {
+            if (!isAvailable(lotlInfo.getPivotInfos())) {
+                return false;
+            }
+            if (!isAvailable(lotlInfo.getTLInfos())) {
+                return false;
+            }
+        }
+        if (!isAvailable(summary.getOtherTLInfos())) {
+            return false;
+        }
+        return true;
+    }
+
+    private <T extends TLInfo> boolean isAvailable(List<T> tlInfos) {
+        for (T tlInfo : tlInfos) {
+            if (!tlInfo.getDownloadCacheInfo().isResultExist() || !isSynchronized(tlInfo.getDownloadCacheInfo())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * This method verifies if all LOTL/TLs have been processed and all of the entries are valid
      * (download, parsing and validation passed)
      *
