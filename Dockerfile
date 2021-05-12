@@ -26,6 +26,8 @@ RUN mvn clean package -pl dss-mock-tsa,dss-standalone-app,dss-standalone-app-pac
 
 FROM tomcat:9
 
+RUN apt-get update && apt-get upgrade -y
+
 COPY --from=BUILD /usr/src/mymaven/dss-demo-webapp/target/dss-demo-webapp-*.war /usr/local/tomcat/webapps/ROOT.war
 
 EXPOSE 8080
