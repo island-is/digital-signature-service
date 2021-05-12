@@ -63,9 +63,9 @@ jobs:
             "token": "$SPINNAKER_WEBHOOK_TOKEN",
             "branch": "${BRANCH_NAME}",
             "parameters": {
-              "docker_tag": "$DOCKER_TAG",
+              "docker_tag": "${{ github.sha }}",
               "feature_name": "$(echo "${BRANCH_NAME}" | cut -d"/" -f2- | tr -cd '[:alnum:].-' | tr '[:upper:]' '[:lower:]' | cut -c1-50)",
-              "images": "$(echo $BUILD_CHUNKS | jq '.[] | fromjson | .projects' -r | tr '\n' ',')",
+              "images": "dss",
               "pull_request_number": "$(echo $GITHUB_REF | cut -d'/' -f3)"
             }
           }
