@@ -57,14 +57,14 @@ jobs:
         env:
           SPINNAKER_WEBHOOK_TOKEN: ${{ secrets.SPINNAKER_WEBHOOK_TOKEN }}
         run: |
-          echo "Sending webhook with branch: '$GIT_BRANCH_DEPLOY'"
+          echo "Sending webhook with branch: '${GITHUB_REF##*/}'"
           curl $SPINNAKER_URL/webhooks/webhook/${{matrix.service}} -H "content-type: application/json" --data-binary @- <<BODY
           {
             "token": "$SPINNAKER_WEBHOOK_TOKEN",
-            "branch": "$GIT_BRANCH_DEPLOY",
+            "branch": "${GITHUB_REF##*/}",
             "parameters": {
               "docker_tag": "$DOCKER_TAG",
-              "feature_name": "$(echo "$GIT_BRANCH_DEPLOY" | cut -d"/" -f2- | tr -cd '[:alnum:].-' | tr '[:upper:]' '[:lower:]' | cut -c1-50)",
+              "feature_name": "$(echo "${GITHUB_REF##*/}" | cut -d"/" -f2- | tr -cd '[:alnum:].-' | tr '[:upper:]' '[:lower:]' | cut -c1-50)",
               "images": "$(echo $BUILD_CHUNKS | jq '.[] | fromjson | .projects' -r | tr '\n' ',')",
               "pull_request_number": "$(echo $GITHUB_REF | cut -d'/' -f3)"
             }
