@@ -51,9 +51,9 @@ jobs:
           tags: "${{ env.DOCKER_REGISTRY }}/dss:${{ github.sha }},${{ env.DOCKER_REGISTRY }}/dss:latest"
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+      - uses: actions/checkout@v2
       - name: Trigger Deployment for service
         # if: github.ref == 'refs/heads/main'
-        uses: actions/checkout@v2
         env:
           SPINNAKER_WEBHOOK_TOKEN: ${{ secrets.SPINNAKER_WEBHOOK_TOKEN }}
         run: |
