@@ -58,7 +58,7 @@ jobs:
           SPINNAKER_WEBHOOK_TOKEN: ${{ secrets.SPINNAKER_WEBHOOK_TOKEN }}
         run: |
           echo "Sending webhook with branch: ${BRANCH_NAME}"
-          curl $SPINNAKER_URL/webhooks/webhook/dss -H "content-type: application/json" --data-binary @- <<BODY
+          curl $SPINNAKER_URL/webhooks/webhook/digital-signature-service -H "content-type: application/json" --data-binary @- <<BODY
           {
             "token": "$SPINNAKER_WEBHOOK_TOKEN",
             "branch": "${BRANCH_NAME}",
