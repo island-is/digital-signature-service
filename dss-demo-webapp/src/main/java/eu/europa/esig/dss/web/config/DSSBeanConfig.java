@@ -318,7 +318,7 @@ public class DSSBeanConfig {
 	public DSSFileLoader onlineLoader() {
 		FileCacheDataLoader onlineFileLoader = new FileCacheDataLoader();
 		onlineFileLoader.setCacheExpirationTime(0);
-		onlineFileLoader.setDataLoader(dataLoader());
+		onlineFileLoader.setDataLoader(trustAllDataLoader());
 		onlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
 		return onlineFileLoader;
 	}
