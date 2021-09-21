@@ -1,29 +1,8 @@
 package eu.europa.esig.dss.web.ws;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.awt.Color;
-import java.io.File;
-import java.io.FileInputStream;
-import java.security.KeyStore.PasswordProtection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.ws.rs.ServerErrorException;
-
-import org.apache.cxf.ext.logging.LoggingInInterceptor;
-import org.apache.cxf.ext.logging.LoggingOutInterceptor;
-import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESContainerExtractor;
-import eu.europa.esig.dss.asic.cades.validation.ASiCEWithCAdESManifestParser;
 import eu.europa.esig.dss.asic.cades.validation.ASiCEWithCAdESManifestValidator;
+import eu.europa.esig.dss.asic.cades.validation.ASiCWithCAdESManifestParser;
 import eu.europa.esig.dss.asic.common.ASiCExtractResult;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
@@ -33,6 +12,7 @@ import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.enumerations.SignaturePackaging;
 import eu.europa.esig.dss.enumerations.SignerTextHorizontalAlignment;
 import eu.europa.esig.dss.enumerations.SignerTextPosition;
+import eu.europa.esig.dss.enumerations.TextWrapping;
 import eu.europa.esig.dss.enumerations.TimestampContainerForm;
 import eu.europa.esig.dss.jades.JWSConverter;
 import eu.europa.esig.dss.model.DSSDocument;
@@ -70,6 +50,25 @@ import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteSignatureParameters;
 import eu.europa.esig.dss.ws.signature.dto.parameters.RemoteTimestampParameters;
 import eu.europa.esig.dss.ws.signature.rest.client.RestDocumentSignatureService;
 import eu.europa.esig.dss.ws.signature.rest.client.RestMultipleDocumentSignatureService;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import javax.ws.rs.ServerErrorException;
+import java.awt.Color;
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyStore.PasswordProtection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RestSignatureServiceIT extends AbstractRestIT {
 
@@ -287,6 +286,59 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 			assertNotNull(iMD);
 		}
 	}
+
+	@Test
+	public void testVisibleSignatureWithTextLineBreaks() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.PAdES_BASELINE_B);
+			parameters.setSigningCertificate(RemoteCertificateConverter.toRemoteCertificate(dssPrivateKeyEntry.getCertificate()));
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+
+			RemoteSignatureImageParameters imageParameters = new RemoteSignatureImageParameters();
+
+			RemoteSignatureFieldParameters fieldParameters = new RemoteSignatureFieldParameters();
+			fieldParameters.setPage(1);
+			fieldParameters.setOriginX(200.F);
+			fieldParameters.setOriginY(100.F);
+			fieldParameters.setWidth(130.F);
+			fieldParameters.setHeight(50.F);
+			imageParameters.setFieldParameters(fieldParameters);
+
+			RemoteSignatureImageTextParameters textParameters = new RemoteSignatureImageTextParameters();
+			textParameters.setText("Digitally signed by JOHN GEORGE ANTHONY WILLIAMS\n" +
+					"Date: 2021.01.01 01:01:01 WET\n" +
+					"Reason: my-reason\n" +
+					"Location: my-location");
+			textParameters.setTextWrapping(TextWrapping.FILL_BOX_AND_LINEBREAK);
+			imageParameters.setTextParameters(textParameters);
+
+			parameters.setImageParameters(imageParameters);
+
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.pdf"));
+			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
+
+			DataToSignOneDocumentDTO dataToSignDTO = new DataToSignOneDocumentDTO(toSignDocument, parameters);
+			ToBeSignedDTO dataToSign = restClient.getDataToSign(dataToSignDTO);
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignOneDocumentDTO signOneDocumentDTO = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = restClient.signDocument(signOneDocumentDTO);
+
+			assertNotNull(signedDocument);
+
+			InMemoryDocument iMD = new InMemoryDocument(signedDocument.getBytes());
+			// iMD.save("target/pades-rest-text-with-breaks-visible.pdf");
+			assertNotNull(iMD);
+		}
+	}
 	
 	@Test
 	public void jadesParallelSigningTest() throws Exception {
@@ -427,8 +479,9 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	public void timestampMultipleDocumentsTest() throws Exception {
 		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.ASiC_E, DigestAlgorithm.SHA512);
 		
-		List<DSSDocument> documentsToSign = new ArrayList<>(Arrays.asList(
-				new DSSDocument[] {new FileDocument(new File("src/test/resources/sample.xml")), new FileDocument(new File("src/test/resources/sample.pdf"))}));
+		List<DSSDocument> documentsToSign = new ArrayList<>(
+				Arrays.asList(new FileDocument(new File("src/test/resources/sample.xml")),
+						new FileDocument(new File("src/test/resources/sample.pdf"))));
 		
 		List<RemoteDocument> remoteDocuments = RemoteDocumentConverter.toRemoteDocuments(documentsToSign);
 		
@@ -447,8 +500,8 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		assertEquals(1, extractedResult.getTimestampDocuments().size());
 		DSSDocument timestamp = extractedResult.getTimestampDocuments().get(0);
 		
-		DSSDocument timestampManifest = ASiCEWithCAdESManifestParser.getLinkedManifest(extractedResult.getManifestDocuments(), timestamp.getName());
-		ManifestFile manifestFile = ASiCEWithCAdESManifestParser.getManifestFile(timestampManifest);
+		DSSDocument timestampManifest = ASiCWithCAdESManifestParser.getLinkedManifest(extractedResult.getManifestDocuments(), timestamp.getName());
+		ManifestFile manifestFile = ASiCWithCAdESManifestParser.getManifestFile(timestampManifest);
 		
 		ASiCEWithCAdESManifestValidator manifestValidator = new ASiCEWithCAdESManifestValidator(manifestFile, extractedResult.getSignedDocuments());
 		List<ManifestEntry> manifestEntries = manifestValidator.validateEntries();
@@ -470,8 +523,9 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	public void timestampASiCSTest() throws Exception {
 		RemoteTimestampParameters timestampParameters = new RemoteTimestampParameters(TimestampContainerForm.ASiC_S, DigestAlgorithm.SHA512);
 		
-		List<DSSDocument> documentsToSign = new ArrayList<>(Arrays.asList(
-				new DSSDocument[] {new FileDocument(new File("src/test/resources/sample.xml")), new FileDocument(new File("src/test/resources/sample.pdf"))}));
+		List<DSSDocument> documentsToSign = new ArrayList<>(
+				Arrays.asList(new FileDocument(new File("src/test/resources/sample.xml")),
+						new FileDocument(new File("src/test/resources/sample.pdf"))));
 		
 		List<RemoteDocument> remoteDocuments = RemoteDocumentConverter.toRemoteDocuments(documentsToSign);
 		

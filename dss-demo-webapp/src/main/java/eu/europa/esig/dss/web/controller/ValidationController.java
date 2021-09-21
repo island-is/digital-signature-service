@@ -1,19 +1,37 @@
 package eu.europa.esig.dss.web.controller;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
-
+import eu.europa.esig.dss.diagnostic.CertificateWrapper;
+import eu.europa.esig.dss.diagnostic.DiagnosticData;
+import eu.europa.esig.dss.diagnostic.DiagnosticDataFacade;
+import eu.europa.esig.dss.diagnostic.RevocationWrapper;
+import eu.europa.esig.dss.diagnostic.TimestampWrapper;
+import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
+import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.RevocationType;
+import eu.europa.esig.dss.enumerations.TimestampType;
+import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
+import eu.europa.esig.dss.model.DSSDocument;
+import eu.europa.esig.dss.model.MimeType;
+import eu.europa.esig.dss.model.x509.CertificateToken;
+import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.spi.x509.CertificateSource;
+import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
+import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.validation.CertificateVerifier;
+import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
+import eu.europa.esig.dss.validation.DocumentValidator;
+import eu.europa.esig.dss.validation.OriginalIdentifierProvider;
+import eu.europa.esig.dss.validation.SignaturePolicyProvider;
+import eu.europa.esig.dss.validation.SignedDocumentValidator;
+import eu.europa.esig.dss.validation.TokenIdentifierProvider;
+import eu.europa.esig.dss.validation.UserFriendlyIdentifierProvider;
+import eu.europa.esig.dss.validation.executor.ValidationLevel;
+import eu.europa.esig.dss.validation.reports.Reports;
+import eu.europa.esig.dss.web.WebAppUtils;
+import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
+import eu.europa.esig.dss.web.exception.SourceNotFoundException;
+import eu.europa.esig.dss.web.model.ValidationForm;
+import eu.europa.esig.dss.web.service.FOPService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,34 +53,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import eu.europa.esig.dss.diagnostic.CertificateWrapper;
-import eu.europa.esig.dss.diagnostic.DiagnosticData;
-import eu.europa.esig.dss.diagnostic.DiagnosticDataFacade;
-import eu.europa.esig.dss.diagnostic.RevocationWrapper;
-import eu.europa.esig.dss.diagnostic.TimestampWrapper;
-import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
-import eu.europa.esig.dss.enumerations.DigestAlgorithm;
-import eu.europa.esig.dss.enumerations.RevocationType;
-import eu.europa.esig.dss.enumerations.TimestampType;
-import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
-import eu.europa.esig.dss.model.DSSDocument;
-import eu.europa.esig.dss.model.MimeType;
-import eu.europa.esig.dss.model.x509.CertificateToken;
-import eu.europa.esig.dss.spi.DSSUtils;
-import eu.europa.esig.dss.spi.x509.CertificateSource;
-import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
-import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.CertificateVerifier;
-import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
-import eu.europa.esig.dss.validation.DocumentValidator;
-import eu.europa.esig.dss.validation.SignedDocumentValidator;
-import eu.europa.esig.dss.validation.executor.ValidationLevel;
-import eu.europa.esig.dss.validation.reports.Reports;
-import eu.europa.esig.dss.web.WebAppUtils;
-import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
-import eu.europa.esig.dss.web.exception.SourceNotFoundException;
-import eu.europa.esig.dss.web.model.ValidationForm;
-import eu.europa.esig.dss.web.service.FOPService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 @Controller
 @SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
@@ -73,10 +75,10 @@ public class ValidationController extends AbstractValidationController {
 
 	private static final String VALIDATION_TILE = "validation";
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
-	
+
 	private static final String[] ALLOWED_FIELDS = { "signedFile", "originalFiles[*].*", "digestToSend", "validationLevel", "defaultPolicy",
 			"policyFile", "signingCertificate", "adjunctCertificates", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens",
-			"includeSemantics" };
+			"includeUserFriendlyIdentifiers", "includeSemantics" };
 
 	@Autowired
 	private FOPService fopService;
@@ -84,11 +86,14 @@ public class ValidationController extends AbstractValidationController {
 	@Autowired
 	private Resource defaultPolicy;
 
+	@Autowired
+	protected SignaturePolicyProvider signaturePolicyProvider;
+
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
 		webDataBinder.registerCustomEditor(ValidationLevel.class, new EnumPropertyEditor(ValidationLevel.class));
 	}
-	
+
 	@InitBinder
 	public void setAllowedFields(WebDataBinder webDataBinder) {
 		webDataBinder.setAllowedFields(ALLOWED_FIELDS);
@@ -104,8 +109,8 @@ public class ValidationController extends AbstractValidationController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String validate(@ModelAttribute("validationForm") @Valid ValidationForm validationForm, BindingResult result, 
-			Model model, HttpServletRequest request) {
+	public String validate(@ModelAttribute("validationForm") @Valid ValidationForm validationForm, BindingResult result,
+						   Model model, HttpServletRequest request) {
 		LOG.trace("Validation BEGINS...");
 		if (result.hasErrors()) {
 			if (LOG.isDebugEnabled()) {
@@ -123,10 +128,15 @@ public class ValidationController extends AbstractValidationController {
 		documentValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(validationForm.isIncludeCertificateTokens(),
 				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens()));
 		documentValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
+		documentValidator.setSignaturePolicyProvider(signaturePolicyProvider);
+
+		TokenIdentifierProvider identifierProvider = validationForm.isIncludeUserFriendlyIdentifiers() ?
+				new UserFriendlyIdentifierProvider() : new OriginalIdentifierProvider();
+		documentValidator.setTokenIdentifierProvider(identifierProvider);
 
 		setSigningCertificate(documentValidator, validationForm);
 		setDetachedContents(documentValidator, validationForm);
-		
+
 		Locale locale = request.getLocale();
 		LOG.trace("Requested locale : {}", locale);
 		if (locale == null) {
@@ -140,7 +150,7 @@ public class ValidationController extends AbstractValidationController {
 
 		return VALIDATION_RESULT_TILE;
 	}
-	
+
 	private void setDetachedContents(DocumentValidator documentValidator, ValidationForm validationForm) {
 		List<DSSDocument> originalFiles = WebAppUtils.originalFilesToDSSDocuments(validationForm.getOriginalFiles());
 		if (Utils.isCollectionNotEmpty(originalFiles)) {
@@ -148,7 +158,7 @@ public class ValidationController extends AbstractValidationController {
 		}
 		documentValidator.setValidationLevel(validationForm.getValidationLevel());
 	}
-	
+
 	private void setSigningCertificate(DocumentValidator documentValidator, ValidationForm validationForm) {
 		CertificateToken signingCertificate = WebAppUtils.toCertificateToken(validationForm.getSigningCertificate());
 		if (signingCertificate != null) {
@@ -156,11 +166,12 @@ public class ValidationController extends AbstractValidationController {
 			signingCertificateSource.addCertificate(signingCertificate);
 			documentValidator.setSigningCertificateSource(signingCertificateSource);
 		}
+
 	}
-	
+
 	private CertificateVerifier getCertificateVerifier(ValidationForm certValidationForm) {
 		CertificateSource adjunctCertSource = WebAppUtils.toCertificateSource(certValidationForm.getAdjunctCertificates());
-	
+
 		CertificateVerifier cv;
 		if (adjunctCertSource == null) {
 			// reuse the default one
@@ -169,10 +180,10 @@ public class ValidationController extends AbstractValidationController {
 			cv = new CertificateVerifierBuilder(certificateVerifier).buildCompleteCopy();
 			cv.setAdjunctCertSources(adjunctCertSource);
 		}
-		
+
 		return cv;
 	}
-	
+
 	private Reports validate(DocumentValidator documentValidator, ValidationForm validationForm) {
 		Reports reports = null;
 
@@ -193,19 +204,22 @@ public class ValidationController extends AbstractValidationController {
 		} else {
 			LOG.error("Not correctly initialized");
 		}
-		
+
 		Date end = new Date();
-	    long duration = end.getTime() - start.getTime();
+		long duration = end.getTime() - start.getTime();
 		LOG.info("Validation process duration : {}ms", duration);
-		
+
 		return reports;
 	}
 
 	@RequestMapping(value = "/download-simple-report")
 	public void downloadSimpleReport(HttpSession session, HttpServletResponse response) {
-		try {
-			String simpleReport = (String) session.getAttribute(XML_SIMPLE_REPORT_ATTRIBUTE);
+		String simpleReport = (String) session.getAttribute(XML_SIMPLE_REPORT_ATTRIBUTE);
+		if (simpleReport == null) {
+			throw new SourceNotFoundException("Simple report not found");
+		}
 
+		try {
 			response.setContentType(MimeType.PDF.getMimeTypeString());
 			response.setHeader("Content-Disposition", "attachment; filename=DSS-Simple-report.pdf");
 
@@ -217,9 +231,12 @@ public class ValidationController extends AbstractValidationController {
 
 	@RequestMapping(value = "/download-detailed-report")
 	public void downloadDetailedReport(HttpSession session, HttpServletResponse response) {
-		try {
-			String detailedReport = (String) session.getAttribute(XML_DETAILED_REPORT_ATTRIBUTE);
+		String detailedReport = (String) session.getAttribute(XML_DETAILED_REPORT_ATTRIBUTE);
+		if (detailedReport == null) {
+			throw new SourceNotFoundException("Detailed report not found");
+		}
 
+		try {
 			response.setContentType(MimeType.PDF.getMimeTypeString());
 			response.setHeader("Content-Disposition", "attachment; filename=DSS-Detailed-report.pdf");
 
@@ -231,106 +248,115 @@ public class ValidationController extends AbstractValidationController {
 
 	@RequestMapping(value = "/download-diagnostic-data")
 	public void downloadDiagnosticData(HttpSession session, HttpServletResponse response) {
-		String report = (String) session.getAttribute(XML_DIAGNOSTIC_DATA_ATTRIBUTE);
+		String diagnosticData = (String) session.getAttribute(XML_DIAGNOSTIC_DATA_ATTRIBUTE);
+		if (diagnosticData == null) {
+			throw new SourceNotFoundException("Diagnostic data not found");
+		}
 
-		response.setContentType(MimeType.XML.getMimeTypeString());
-		response.setHeader("Content-Disposition", "attachment; filename=DSS-Diagnotic-data.xml");
 		try {
-			Utils.write(report.getBytes(StandardCharsets.UTF_8), response.getOutputStream());
+			response.setContentType(MimeType.XML.getMimeTypeString());
+			response.setHeader("Content-Disposition", "attachment; filename=DSS-Diagnotic-data.xml");
+			Utils.copy(new ByteArrayInputStream(diagnosticData.getBytes()), response.getOutputStream());
 		} catch (IOException e) {
 			LOG.error("An error occurred while downloading diagnostic data : " + e.getMessage(), e);
 		}
 	}
-	
-    @RequestMapping(value = "/diag-data.svg")
-    public @ResponseBody ResponseEntity<String> downloadSVG(HttpSession session, HttpServletResponse response) {
-        String report = (String) session.getAttribute(XML_DIAGNOSTIC_DATA_ATTRIBUTE);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.valueOf(MimeType.SVG.getMimeTypeString()));
-        ResponseEntity<String> svgEntity = new ResponseEntity<String>(xsltService.generateSVG(report), headers,
-                HttpStatus.OK);
-        return svgEntity;
-    }
+	@RequestMapping(value = "/diag-data.svg")
+	public @ResponseBody ResponseEntity<String> downloadSVG(HttpSession session, HttpServletResponse response) {
+		String diagnosticData = (String) session.getAttribute(XML_DIAGNOSTIC_DATA_ATTRIBUTE);
+		if (diagnosticData == null) {
+			throw new SourceNotFoundException("Diagnostic data not found");
+		}
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.valueOf(MimeType.SVG.getMimeTypeString()));
+		ResponseEntity<String> svgEntity = new ResponseEntity<>(xsltService.generateSVG(diagnosticData), headers,
+				HttpStatus.OK);
+		return svgEntity;
+	}
 
 	@RequestMapping(value = "/download-certificate")
 	public void downloadCertificate(@RequestParam(value = "id") String id, HttpSession session, HttpServletResponse response) {
 		DiagnosticData diagnosticData = getDiagnosticData(session);
-        CertificateWrapper certificate = diagnosticData.getUsedCertificateById(id);
-        if (certificate == null) {
-            String message = "Certificate " + id + " not found";
-            LOG.warn(message);
-            throw new SourceNotFoundException(message);
-        }
-        String pemCert = DSSUtils.convertToPEM(DSSUtils.loadCertificate(certificate.getBinaries()));
+		CertificateWrapper certificate = diagnosticData.getUsedCertificateById(id);
+		if (certificate == null) {
+			String message = "Certificate " + id + " not found";
+			LOG.warn(message);
+			throw new SourceNotFoundException(message);
+		}
+		String pemCert = DSSUtils.convertToPEM(DSSUtils.loadCertificate(certificate.getBinaries()));
 		String filename = DSSUtils.getNormalizedString(certificate.getReadableCertificateName()) + ".cer";
-        
-        addTokenToResponse(response, filename, MimeType.CER, pemCert.getBytes());
+
+		addTokenToResponse(response, filename, MimeType.CER, pemCert.getBytes());
 	}
 
 	@RequestMapping(value = "/download-revocation")
 	public void downloadRevocationData(@RequestParam(value = "id") String id, @RequestParam(value = "format") String format, HttpSession session,
-			HttpServletResponse response) {
+									   HttpServletResponse response) {
 		DiagnosticData diagnosticData = getDiagnosticData(session);
-        RevocationWrapper revocationData = diagnosticData.getRevocationById(id);
-        if (revocationData == null) {
-            String message = "Revocation data " + id + " not found";
-            LOG.warn(message);
-            throw new SourceNotFoundException(message);
-        }
-        String filename = revocationData.getId();
-        MimeType mimeType;
-        byte[] binaries;
+		RevocationWrapper revocationData = diagnosticData.getRevocationById(id);
+		if (revocationData == null) {
+			String message = "Revocation data " + id + " not found";
+			LOG.warn(message);
+			throw new SourceNotFoundException(message);
+		}
+		String filename = revocationData.getId();
+		MimeType mimeType;
+		byte[] binaries;
 
-        if (RevocationType.CRL.equals(revocationData.getRevocationType())) {
-            mimeType = MimeType.CRL;
-            filename += ".crl";
+		if (RevocationType.CRL.equals(revocationData.getRevocationType())) {
+			mimeType = MimeType.CRL;
+			filename += ".crl";
 
-            if (Utils.areStringsEqualIgnoreCase(format, "pem")) {
-                String pem = "-----BEGIN CRL-----\n";
-                pem += Utils.toBase64(revocationData.getBinaries());
-                pem += "\n-----END CRL-----";
-                binaries = pem.getBytes();
-            } else {
-            	binaries = revocationData.getBinaries();
-            }
-        } else {
-            mimeType = MimeType.BINARY;
-            filename += ".ocsp";
-            binaries = revocationData.getBinaries();
-        }
-        
-        addTokenToResponse(response, filename, mimeType, binaries);
+			if (Utils.areStringsEqualIgnoreCase(format, "pem")) {
+				String pem = "-----BEGIN CRL-----\n";
+				pem += Utils.toBase64(revocationData.getBinaries());
+				pem += "\n-----END CRL-----";
+				binaries = pem.getBytes();
+			} else {
+				binaries = revocationData.getBinaries();
+			}
+		} else {
+			mimeType = MimeType.BINARY;
+			filename += ".ocsp";
+			binaries = revocationData.getBinaries();
+		}
+
+		addTokenToResponse(response, filename, mimeType, binaries);
 	}
 
 	@RequestMapping(value = "/download-timestamp")
 	public void downloadTimestamp(@RequestParam(value = "id") String id, @RequestParam(value = "format") String format, HttpSession session,
-			HttpServletResponse response) {
+								  HttpServletResponse response) {
 		DiagnosticData diagnosticData = getDiagnosticData(session);
-        TimestampWrapper timestamp = diagnosticData.getTimestampById(id);
-        if (timestamp == null) {
-            String message = "Timestamp " + id + " not found";
-            LOG.warn(message);
-            throw new SourceNotFoundException(message);
-        }
-        TimestampType type = timestamp.getType();
-        
-        byte[] binaries;
-        if (Utils.areStringsEqualIgnoreCase(format, "pem")) {
-            String pem = "-----BEGIN TIMESTAMP-----\n";
-            pem += Utils.toBase64(timestamp.getBinaries());
-            pem += "\n-----END TIMESTAMP-----";
-            binaries = pem.getBytes();
-        } else {
-        	binaries = timestamp.getBinaries();
-        }
-        
-        String filename = type.name() + ".tst";
-        addTokenToResponse(response, filename, MimeType.TST, binaries);
+		TimestampWrapper timestamp = diagnosticData.getTimestampById(id);
+		if (timestamp == null) {
+			String message = "Timestamp " + id + " not found";
+			LOG.warn(message);
+			throw new SourceNotFoundException(message);
+		}
+		TimestampType type = timestamp.getType();
+
+		byte[] binaries;
+		if (Utils.areStringsEqualIgnoreCase(format, "pem")) {
+			String pem = "-----BEGIN TIMESTAMP-----\n";
+			pem += Utils.toBase64(timestamp.getBinaries());
+			pem += "\n-----END TIMESTAMP-----";
+			binaries = pem.getBytes();
+		} else {
+			binaries = timestamp.getBinaries();
+		}
+
+		String filename = type.name() + ".tst";
+		addTokenToResponse(response, filename, MimeType.TST, binaries);
 	}
 
-	public DiagnosticData getDiagnosticData(HttpSession session) {
+	protected DiagnosticData getDiagnosticData(HttpSession session) {
 		String diagnosticDataXml = (String) session.getAttribute(XML_DIAGNOSTIC_DATA_ATTRIBUTE);
+		if (diagnosticDataXml == null) {
+			throw new SourceNotFoundException("Diagnostic data not found");
+		}
 		try {
 			XmlDiagnosticData xmlDiagData = DiagnosticDataFacade.newFacade().unmarshall(diagnosticDataXml);
 			return new DiagnosticData(xmlDiagData);
@@ -339,16 +365,16 @@ public class ValidationController extends AbstractValidationController {
 		}
 		return null;
 	}
-    
-    protected void addTokenToResponse(HttpServletResponse response, String filename, MimeType mimeType, byte[] binaries) {
-    	response.setContentType(MimeType.TST.getMimeTypeString());
-        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
-        try (InputStream is = new ByteArrayInputStream(binaries); OutputStream os = response.getOutputStream()) {
-            Utils.copy(is, os);
-        } catch (IOException e) {
-            LOG.error("An error occurred while downloading a file : " + e.getMessage(), e);
-        }
-    }
+
+	protected void addTokenToResponse(HttpServletResponse response, String filename, MimeType mimeType, byte[] binaries) {
+		response.setContentType(MimeType.TST.getMimeTypeString());
+		response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+		try (InputStream is = new ByteArrayInputStream(binaries); OutputStream os = response.getOutputStream()) {
+			Utils.copy(is, os);
+		} catch (IOException e) {
+			LOG.error("An error occurred while downloading a file : " + e.getMessage(), e);
+		}
+	}
 
 	@ModelAttribute("validationLevels")
 	public ValidationLevel[] getValidationLevels() {

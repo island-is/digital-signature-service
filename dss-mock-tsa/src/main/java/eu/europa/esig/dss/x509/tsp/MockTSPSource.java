@@ -1,16 +1,13 @@
 package eu.europa.esig.dss.x509.tsp;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.model.DSSException;
+import eu.europa.esig.dss.model.TimestampBinary;
+import eu.europa.esig.dss.model.x509.CertificateToken;
+import eu.europa.esig.dss.spi.DSSASN1Utils;
+import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
+import eu.europa.esig.dss.token.KSPrivateKeyEntry;
+import eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -36,14 +33,17 @@ import org.bouncycastle.tsp.TimeStampTokenGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.europa.esig.dss.enumerations.DigestAlgorithm;
-import eu.europa.esig.dss.model.DSSException;
-import eu.europa.esig.dss.model.TimestampBinary;
-import eu.europa.esig.dss.model.x509.CertificateToken;
-import eu.europa.esig.dss.spi.DSSASN1Utils;
-import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
-import eu.europa.esig.dss.token.KSPrivateKeyEntry;
-import eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 public class MockTSPSource implements TSPSource {
 
@@ -67,9 +67,7 @@ public class MockTSPSource implements TSPSource {
 
 	@Override
 	public TimestampBinary getTimeStampResponse(DigestAlgorithm digestAlgorithm, byte[] digest) {
-		if (token == null) {
-			throw new DSSException("KeyStore token is not defined!");
-		}
+		Objects.requireNonNull(token, "KeyStore token is not defined!");
 		try {
 			TimeStampRequestGenerator requestGenerator = new TimeStampRequestGenerator();
 			requestGenerator.setCertReq(true);
@@ -77,19 +75,20 @@ public class MockTSPSource implements TSPSource {
 
 			KSPrivateKeyEntry ksPK = (KSPrivateKeyEntry) token.getKey(alias);
 			if (ksPK == null) {
-				throw new DSSException("Unable to initialize the MockTSPSource");
+				throw new IllegalArgumentException(String.format("Unable to initialize the MockTSPSource! " +
+						"Reason : Unable to retrieve private key from the given keyStore with alias '%s'", alias));
 			}
 
 			LOG.info("Timestamping with {}", ksPK.getCertificate());
 
 			X509CertificateHolder certificate = new X509CertificateHolder(ksPK.getCertificate().getEncoded());
-			List<X509Certificate> chain = new ArrayList<X509Certificate>();
+			List<X509Certificate> chain = new ArrayList<>();
 			CertificateToken[] certificateChain = ksPK.getCertificateChain();
 			for (CertificateToken token : certificateChain) {
 				chain.add(token.getCertificate());
 			}
 
-			Set<ASN1ObjectIdentifier> accepted = new HashSet<ASN1ObjectIdentifier>();
+			Set<ASN1ObjectIdentifier> accepted = new HashSet<>();
 			accepted.add(TSPAlgorithms.SHA1);
 			accepted.add(TSPAlgorithms.SHA256);
 			accepted.add(TSPAlgorithms.SHA512);
@@ -116,7 +115,6 @@ public class MockTSPSource implements TSPSource {
 			
 		} catch (IOException | TSPException | OperatorException | CertificateException e) {
 			throw new DSSException("Unable to generate a timestamp from the Mock", e);
-			
 		}
 	}
 

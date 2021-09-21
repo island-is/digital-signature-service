@@ -1,7 +1,9 @@
 package eu.europa.esig.dss.web.controller;
 
-import javax.servlet.http.HttpServletRequest;
-
+import eu.europa.esig.dss.model.DSSException;
+import eu.europa.esig.dss.web.exception.SignatureOperationException;
+import eu.europa.esig.dss.web.exception.InternalServerException;
+import eu.europa.esig.dss.web.exception.SourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -11,13 +13,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import eu.europa.esig.dss.model.DSSException;
-import eu.europa.esig.dss.web.exception.ApplicationJsonRequestException;
-import eu.europa.esig.dss.web.exception.InternalServerException;
-import eu.europa.esig.dss.web.exception.SourceNotFoundException;
+import javax.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -66,6 +66,14 @@ public class GlobalExceptionHandler {
         return getMAV(req, e, HttpStatus.INTERNAL_SERVER_ERROR, DEFAULT_ERROR_VIEW);
     }
 
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ModelAndView maxUploadSizeExceededExceptionHandler(HttpServletRequest req, Exception e) {
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("The max upload file size exceeded. Reason : {}", e.getMessage());
+		}
+		return getMAV(req, new DSSException("Uploaded file size exceeded max allowed limit."), HttpStatus.FORBIDDEN, DEFAULT_ERROR_VIEW);
+	}
+
 	private ModelAndView getMAV(HttpServletRequest req, Exception e, HttpStatus status, String viewName) {
 		ModelAndView mav = new ModelAndView();
 		mav.addObject("error", status.getReasonPhrase());
@@ -75,13 +83,11 @@ public class GlobalExceptionHandler {
 		mav.setViewName(viewName);
 		return mav;
 	}
-    
-    @ExceptionHandler(ApplicationJsonRequestException.class)
-    public ResponseEntity<String> ApplicationJsonRequestExceptionHandler(HttpServletRequest req, Exception e) throws Exception {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("An error occurred during a JSON request : uri = '{}', message = '{}'", req.getRequestURI(), e.getMessage());
-        }
-        return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+
+	@ExceptionHandler(SignatureOperationException.class)
+	public ResponseEntity<String> signatureOperationExceptionHandler(HttpServletRequest req, Exception e) throws Exception {
+		LOG.error("An error occurred on URI call [{}] : {}", req.getRequestURI(), e.getMessage(), e);
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }
