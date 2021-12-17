@@ -3,13 +3,6 @@
     <div class="card">
         <div class="card-header bg-primary">e-Signature</div>
         <div class="list-group list-group-flush">
-            <a th:href="@{/sign-a-document}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-a-document' ? 'active' : ''}" th:text="#{label.signADocument}">Sign a document</a>
-            <a th:href="@{/sign-a-digest}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-a-digest' ? 'active' : ''}" th:text="#{label.signADigest}">Sign a digest</a>
-			<a th:href="@{/sign-a-pdf}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-a-pdf' ? 'active' : ''}" th:text="#{label.signAPDF}">Sign a PDF</a>
-            <a th:href="@{/sign-with-jades}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-with-jades' ? 'active' : ''}" th:text="#{label.signWithJAdES}">Sign with JAdES</a>
-            <a th:href="@{/sign-multiple-documents}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/sign-multiple-documents' ? 'active' : ''}" th:text="#{label.signMultiDocuments}">Sign multi documents</a>
-            <a th:href="@{/counter-sign}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/counter-sign' ? 'active' : ''}" th:text="#{label.counterSignature}">Counter signature</a>
-            <a th:href="@{/signature-standalone}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/signature-standalone' ? 'active' : ''}" th:text="#{label.standalone.application}">Standalone application</a>
             <a th:href="@{/signature-rest}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/signature-rest' ? 'active' : ''}" th:text="#{label.rest.soap.services}">REST/SOAP WebServices</a>
         </div>
     </div>
@@ -17,12 +10,7 @@
     <div class="card mt-3">
         <div class="card-header bg-primary">Server side</div>
         <div class="list-group list-group-flush">
-            <a th:href="@{/extension}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/extension' ? 'active' : ''}" th:text="#{label.extend}">Extension</a>
-            <a th:href="@{/timestamp-a-document}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/timestamp-a-document' ? 'active' : ''}" th:text="#{label.timestamp.doc}">Timestamp a document</a>
             <a th:href="@{/validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/validation' ? 'active' : ''}" th:text="#{label.validate}">Signature Validation</a>
-            <a th:href="@{/certificate-validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/certificate-validation' ? 'active' : ''}" th:text="#{label.cert.validate}">Certificate Validation</a>
-            <a th:href="@{/qwac-validation}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/qwac-validation' ? 'active' : ''}" th:text="#{label.qwac.validate}">QWAC Validation</a>
-            <a th:href="@{/replay-diagnostic-data}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/replay-diagnostic-data' ? 'active' : ''}" th:text="#{label.replay.diag}">Replay Diagnostic Data</a>
             <a th:href="@{/tl-info}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/tl-info' ? 'active' : ''}" th:text="#{label.tsls}">Trusted lists</a>
       		<a th:href="@{/oj-certificates}" class="list-group-item" th:classappend="${#httpServletRequest.getRequestURI() == '/oj-certificates' ? 'active' : ''}" th:title="#{label.eu.oj.certificates.page}" th:text="#{label.eu.oj.certificates}"></a>
         </div>
