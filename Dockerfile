@@ -28,6 +28,9 @@ FROM tomcat:9
 
 RUN apt-get update && apt-get upgrade -y
 
+RUN wget -O dd-java-agent.jar https://dtdg.co/latest-java-tracer
+COPY setenv.sh /usr/local/tomcat/bin
+
 COPY --from=BUILD /usr/src/mymaven/dss-demo-webapp/target/dss-demo-webapp-*.war /usr/local/tomcat/webapps/ROOT.war
 
 EXPOSE 8080
