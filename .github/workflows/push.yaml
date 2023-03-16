@@ -39,6 +39,9 @@ jobs:
           echo "Docker tag will be ${DOCKER_TAG}"
           echo "::set-output name=DOCKER_TAG::${DOCKER_TAG}"
           echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
+
+      outputs:
+        DOCKER_TAG: ${{ steps.docker_tags.outputs.DOCKER_TAG }}
   docker-build:
     runs-on: ubuntu-20.04
     timeout-minutes: 20
