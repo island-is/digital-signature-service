@@ -14,6 +14,25 @@ env:
   SPINNAKER_URL: https://spinnaker-gate.shared.devland.is
 
 jobs:
+  prepare:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 10
+    steps:
+      - name: Generate docker image tag
+        id: docker_tags
+        run: |
+          export DOCKER_BRANCH_TAG=$(echo ${GIT_BRANCH:0:45} | tr "/." "-" )
+          SHA="${{ github.event.pull_request.head.sha }}"
+          echo "SHA='$SHA' retrieved from event"
+          if [[ "$SHA" == "" ]]; then
+            SHA=$GITHUB_SHA
+            echo "SHA='$SHA', retrived from action environment"
+          fi
+          echo "Using SHA='$SHA' as docker tag sha"
+          export DOCKER_TAG=${DOCKER_BRANCH_TAG}_${SHA:0:7}_${GITHUB_RUN_NUMBER}
+          echo "Docker tag will be ${DOCKER_TAG}"
+          echo "::set-output name=DOCKER_TAG::${DOCKER_TAG}"
+          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
   docker-build:
     runs-on: ubuntu-20.04
     timeout-minutes: 20
@@ -44,11 +63,13 @@ jobs:
             ${{ runner.os }}-buildx-cache-v2
 
       - name: Build and push
+        env:
+          DOCKER_TAG: ${{ needs.prepare.outputs.DOCKER_TAG}}
         uses: docker/build-push-action@v2
         with:
           context: .
           push: true
-          tags: "${{ env.DOCKER_REGISTRY }}/dss:${{ github.sha }},${{ env.DOCKER_REGISTRY }}/dss:latest"
+          tags: "${{ env.DOCKER_REGISTRY }}/dss:${{env.DOCKER_TAG}},${{ env.DOCKER_REGISTRY }}/dss:latest"
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
       - uses: nelonoel/branch-name@v1.0.1
