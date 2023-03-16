@@ -18,6 +18,12 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 10
     steps:
+      - name: Get git branch
+        id: git-branch
+        run: |
+          GIT_BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF/refs\/heads\//}}"
+          echo "::set-output name=GIT_BRANCH::${GIT_BRANCH}"
+          echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
       - name: Generate docker image tag
         id: docker_tags
         run: |
