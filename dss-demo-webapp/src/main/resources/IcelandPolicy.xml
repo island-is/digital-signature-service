@@ -51,6 +51,10 @@
 			<PdfPageDifference Level="FAIL" />
 			<PdfAnnotationOverlap Level="WARN" />
 <!--			<PdfVisualDifference Level="WARN" /> -->
+			<DocMDP Level="WARN" />
+			<FieldMDP Level="WARN" />
+			<SigFieldLock Level="WARN" />
+			<UndefinedChanges Level="WARN" />
 <!-- 			<TrustedServiceTypeIdentifier Level="WARN"> -->
 <!-- 				<Id>http://uri.etsi.org/TrstSvc/Svctype/CA/QC</Id> -->
 <!-- 			</TrustedServiceTypeIdentifier> -->
@@ -68,13 +72,14 @@
 				<AuthorityInfoAccessPresent Level="WARN" />
 				<RevocationInfoAccessPresent Level="WARN" />
 				<RevocationDataAvailable Level="FAIL" />
+				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				Checking if OCSP responses contain a nextUpdate field is needed: 
 						From RFC 6960:
 						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
-					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
+					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent constraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationDataFreshness Level="FAIL" />
+				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
 				<KeyUsage Level="WARN">
 					<Id>nonRepudiation</Id>
 				</KeyUsage>
@@ -85,8 +90,9 @@
 					The check must be present, else the process is not compliant to this version (v1.3.1) of the EN. In particular, this new sub-indication was introduced to fix an issue in the EN where expired (and thus unusable) revocation data were not rejected by the validation process in v1.2.1 -->
 				<RevocationIssuerNotExpired Level="FAIL" />
 				<NotSelfSigned Level="WARN" />
-<!-- 				<Qualification Level="WARN" /> -->
-<!-- 				<SupportedByQSCD Level="WARN" /> -->
+<!--				<QcCompliance Level="WARN" /> -->
+<!--				<QcSSCD Level="WARN" /> -->
+<!-- 				<QcLegislationCountryCodes Level="WARN" /> -->
 <!-- 				<IssuedToNaturalPerson Level="INFORM" /> -->
 <!-- 				<IssuedToLegalPerson Level="INFORM" /> -->
 				<UsePseudonym Level="INFORM" />
@@ -99,7 +105,7 @@
 						<!-- 		<Algo>Ed25519</Algo> 				Not referenced in ETSI/SOGIS -->
 					</AcceptableEncryptionAlgo>
 					<MiniPublicKeySize>
-						<Algo Size="160">DSA</Algo>
+						<Algo Size="1024">DSA</Algo>
 						<Algo Size="1024">RSA</Algo>
 						<Algo Size="160">ECDSA</Algo>
 						<Algo Size="160">PLAIN-ECDSA</Algo>
@@ -137,10 +143,9 @@
 						<Algo Date="2015">WHIRLPOOL</Algo> <!-- ETSI 119 312 V1.1.1 -->
 						<!-- end Digest algorithms -->
 						<!-- Encryption algorithms -->
-						<Algo Date="2013" Size="160">DSA</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.1.1 -->
-						<Algo Date="2013" Size="192">DSA</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.1.1 -->
-						<Algo Date="2026" Size="224">DSA</Algo> <!-- ETSI 119 312 V1.3.1 -->
-						<Algo Date="2029" Size="256">DSA</Algo> <!-- ETSI 119 312 V1.3.1 -->
+						<Algo Date="2013" Size="1024">DSA</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.1.1 -->
+						<Algo Date="2026" Size="2048">DSA</Algo> <!-- ETSI 119 312 V1.4.2 -->
+						<Algo Date="2029" Size="3072">DSA</Algo> <!-- ETSI 119 312 V1.4.2 -->
 						<Algo Date="2009" Size="1024">RSA</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.0.0 -->
 						<Algo Date="2016" Size="1536">RSA</Algo> <!-- ETSI 119 312 V1.1.1 -->
 						<Algo Date="2026" Size="1900">RSA</Algo> <!-- ETSI 119 312 V1.4.2 -->
@@ -166,13 +171,14 @@
 				<Signature Level="FAIL" />
 				<NotExpired Level="FAIL" />
 				<RevocationDataAvailable Level="FAIL" />
+				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				Checking if OCSP responses contain a nextUpdate field is needed: 
 						From RFC 6960:
 						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
 					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationDataFreshness Level="FAIL" />
+				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<Cryptographic Level="FAIL">
@@ -253,18 +259,20 @@
 			<SigningCertificatePresent Level="FAIL" />
 			<UnicitySigningCertificate Level="WARN" />
 			<SigningCertificateRefersCertificateChain Level="WARN" />
+			<SigningCertificateDigestAlgorithm Level="WARN" />
 			<CertDigestPresent Level="FAIL" />
 			<CertDigestMatch Level="FAIL" />
 			<IssuerSerialMatch Level="WARN" />
+			<KeyIdentifierMatch Level="WARN" />
 			<SigningTime Level="FAIL" />
 			<MessageDigestOrSignedPropertiesPresent Level="FAIL" />
-<!--		<ContentType Level="FAIL" value="1.2.840.113549.1.7.1" />
-			<ContentHints Level="FAIL" value="*" /> -->
+<!--		<ContentType Level="FAIL" value="1.2.840.113549.1.7.1" /> -->
+<!--		<ContentHints Level="FAIL" value="*" /> -->
 			<CommitmentTypeIndication Level="FAIL">
 				<Id>1.2.840.113549.1.9.16.6.5</Id>
 			</CommitmentTypeIndication>
-<!--			<SignerLocation Level="FAIL" />
-			<ContentTimeStamp Level="FAIL" /> -->
+<!--		<SignerLocation Level="FAIL" /> -->
+<!--		<ContentTimeStamp Level="FAIL" /> -->
 		</SignedAttributes>
 		<UnsignedAttributes>
 <!--		<CounterSignature Level="IGNORE" /> check presence -->
@@ -294,13 +302,14 @@
 				<AuthorityInfoAccessPresent Level="WARN" />
 				<RevocationInfoAccessPresent Level="WARN" />
 				<RevocationDataAvailable Level="FAIL" />
+				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				Checking if OCSP responses contain a nextUpdate field is needed: 
 						From RFC 6960:
 						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
 					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationDataFreshness Level="FAIL" />
+				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
 				<KeyUsage Level="WARN">
 					<Id>nonRepudiation</Id>
 				</KeyUsage>
@@ -308,8 +317,8 @@
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<NotSelfSigned Level="WARN" />
-<!-- 				<Qualification Level="WARN" /> -->
-<!-- 				<SupportedByQSCD Level="WARN" /> -->
+<!--				<QcCompliance Level="WARN" /> -->
+<!--				<QcSSCD Level="WARN" /> -->
 <!-- 				<IssuedToNaturalPerson Level="INFORM" /> -->
 <!-- 				<IssuedToLegalPerson Level="INFORM" /> -->
 				<UsePseudonym Level="INFORM" />
@@ -319,13 +328,14 @@
 				<Signature Level="FAIL" />
 				<NotExpired Level="FAIL" />
 				<RevocationDataAvailable Level="FAIL" />
+				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				Checking if OCSP responses contain a nextUpdate field is needed: 
 						From RFC 6960:
 						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
 					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationDataFreshness Level="FAIL" />
+				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<Cryptographic />
@@ -334,11 +344,16 @@
 		</BasicSignatureConstraints>
 		<SignedAttributes>
 			<SigningCertificatePresent Level="FAIL" />
+			<UnicitySigningCertificate Level="WARN" />
+			<SigningCertificateRefersCertificateChain Level="WARN" />
+			<SigningCertificateDigestAlgorithm Level="WARN" />
 			<CertDigestPresent Level="FAIL" />
 			<CertDigestMatch Level="FAIL" />
 			<IssuerSerialMatch Level="WARN" />
+			<KeyIdentifierMatch Level="WARN" />
 			<SigningTime Level="FAIL" />
 			<MessageDigestOrSignedPropertiesPresent Level="FAIL" />
+			<EllipticCurveKeySize Level="WARN" />
 <!--		<ContentType Level="FAIL" value="1.2.840.113549.1.7.1" />
 			<ContentHints Level="FAIL" value="*" />
 			<CommitmentTypeIndication Level="FAIL">
@@ -377,13 +392,14 @@
 				<Signature Level="FAIL" />
 				<NotExpired Level="FAIL" />
 				<RevocationDataAvailable Level="FAIL" />
+				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				Checking if OCSP responses contain a nextUpdate field is needed: 
 						From RFC 6960:
 						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
 					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationDataFreshness Level="IGNORE" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="-24" />
 				<ExtendedKeyUsage Level="WARN">
 					<Id>timeStamping</Id>
 				</ExtendedKeyUsage>
@@ -396,13 +412,14 @@
 				<Signature Level="FAIL" />
 				<NotExpired Level="FAIL" />
 				<RevocationDataAvailable Level="WARN" />
+				<AcceptableRevocationDataFound Level="WARN" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				Checking if OCSP responses contain a nextUpdate field is needed: 
 						From RFC 6960:
 						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
 					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationDataFreshness Level="IGNORE" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="-24" />
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<Cryptographic />
@@ -411,14 +428,15 @@
 		</BasicSignatureConstraints>
 		<SignedAttributes>
 			<SigningCertificatePresent Level="WARN" />
-			<SigningCertificateRefersCertificateChain Level="WARN" />
 			<!-- <UnicitySigningCertificate Level="WARN" /> RFC 5816 -->
+			<SigningCertificateRefersCertificateChain Level="WARN" />
+			<!-- <SigningCertificateDigestAlgorithm Level="WARN" /> -->
 			<CertDigestPresent Level="WARN" />
 			<IssuerSerialMatch Level="WARN" />
 		</SignedAttributes>
+		<TSAGeneralNameContentMatch Level="WARN" />
 	</Timestamp>
 	<Revocation>
-        <RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
         <UnknownStatus Level="FAIL" />
         <SelfIssuedOCSP Level="WARN" />
 		<BasicSignatureConstraints>
@@ -431,13 +449,14 @@
 				<Signature Level="FAIL" />
 				<NotExpired Level="FAIL" />
 				<RevocationDataAvailable Level="FAIL" />
+				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				Checking if OCSP responses contain a nextUpdate field is needed: 
 						From RFC 6960:
 						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
 					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationDataFreshness Level="IGNORE" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="-24" />
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<Cryptographic />
@@ -446,13 +465,14 @@
 				<Signature Level="FAIL" />
 				<NotExpired Level="FAIL" />
 				<RevocationDataAvailable Level="WARN" />
+				<AcceptableRevocationDataFound Level="WARN" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				Checking if OCSP responses contain a nextUpdate field is needed: 
 						From RFC 6960:
 						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
 					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationDataFreshness Level="IGNORE" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="-24" />
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<Cryptographic />
@@ -469,7 +489,7 @@
 <!-- 		<Algo>Ed25519</Algo> 				Not referenced in ETSI/SOGIS -->
 		</AcceptableEncryptionAlgo>
 		<MiniPublicKeySize>
-			<Algo Size="160">DSA</Algo>
+			<Algo Size="1024">DSA</Algo>
 			<Algo Size="1024">RSA</Algo>
 			<Algo Size="160">ECDSA</Algo>
 			<Algo Size="160">PLAIN-ECDSA</Algo>
@@ -507,10 +527,9 @@
 			<Algo Date="2015">WHIRLPOOL</Algo> <!-- ETSI 119 312 V1.1.1 -->
 			<!-- end Digest algorithms -->
 			<!-- Encryption algorithms -->
-			<Algo Date="2013" Size="160">DSA</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.1.1 -->
-			<Algo Date="2013" Size="192">DSA</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.1.1 -->
-			<Algo Date="2026" Size="224">DSA</Algo> <!-- ETSI 119 312 V1.3.1 -->
-			<Algo Date="2029" Size="256">DSA</Algo> <!-- ETSI 119 312 V1.3.1 -->
+			<Algo Date="2013" Size="1024">DSA</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.1.1 -->
+			<Algo Date="2026" Size="2048">DSA</Algo> <!-- ETSI 119 312 V1.4.2 -->
+			<Algo Date="2029" Size="3072">DSA</Algo> <!-- ETSI 119 312 V1.4.2 -->
 			<Algo Date="2009" Size="1024">RSA</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.0.0 -->
 			<Algo Date="2016" Size="1536">RSA</Algo> <!-- ETSI 119 312 V1.1.1 -->
 			<Algo Date="2026" Size="1900">RSA</Algo> <!-- ETSI 119 312 V1.4.2 -->

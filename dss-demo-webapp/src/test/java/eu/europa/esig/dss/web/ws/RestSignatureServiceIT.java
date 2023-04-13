@@ -3,7 +3,7 @@ package eu.europa.esig.dss.web.ws;
 import eu.europa.esig.dss.asic.cades.ASiCWithCAdESContainerExtractor;
 import eu.europa.esig.dss.asic.cades.validation.ASiCEWithCAdESManifestValidator;
 import eu.europa.esig.dss.asic.cades.validation.ASiCWithCAdESManifestParser;
-import eu.europa.esig.dss.asic.common.ASiCExtractResult;
+import eu.europa.esig.dss.asic.common.ASiCContent;
 import eu.europa.esig.dss.enumerations.ASiCContainerType;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
 import eu.europa.esig.dss.enumerations.JWSSerializationType;
@@ -59,10 +59,13 @@ import org.junit.jupiter.api.Test;
 import javax.ws.rs.ServerErrorException;
 import java.awt.Color;
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStore.PasswordProtection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -81,7 +84,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 
 		factory.setAddress(getBaseCxf() + CXFConfig.REST_SIGNATURE_ONE_DOCUMENT);
 		factory.setServiceClass(RestDocumentSignatureService.class);
-		factory.setProviders(Arrays.asList(jacksonJsonProvider()));
+		factory.setProviders(Collections.singletonList(jacksonJsonProvider()));
 
 		LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
 		factory.getInInterceptors().add(loggingInInterceptor);
@@ -97,7 +100,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 
 		factory.setAddress(getBaseCxf() + CXFConfig.REST_SIGNATURE_MULTIPLE_DOCUMENTS);
 		factory.setServiceClass(RestMultipleDocumentSignatureService.class);
-		factory.setProviders(Arrays.asList(jacksonJsonProvider()));
+		factory.setProviders(Collections.singletonList(jacksonJsonProvider()));
 
 		factory.getInInterceptors().add(loggingInInterceptor);
 		factory.getInFaultInterceptors().add(loggingInInterceptor);
@@ -110,7 +113,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 
 	@Test
 	public void testSigningAndExtension() throws Exception {
-		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(Files.newInputStream(Paths.get("src/test/resources/user_a_rsa.p12")),
 				new PasswordProtection("password".toCharArray()))) {
 
 			List<DSSPrivateKeyEntry> keys = token.getKeys();
@@ -149,7 +152,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 
 	@Test
 	public void testSigningAndExtensionDigestDocument() throws Exception {
-		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(Files.newInputStream(Paths.get("src/test/resources/user_a_rsa.p12")),
 				new PasswordProtection("password".toCharArray()))) {
 
 			List<DSSPrivateKeyEntry> keys = token.getKeys();
@@ -177,7 +180,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 
 			parameters = new RemoteSignatureParameters();
 			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_T);
-			parameters.setDetachedContents(Arrays.asList(toSignDocument));
+			parameters.setDetachedContents(Collections.singletonList(toSignDocument));
 
 			RemoteDocument extendedDocument = restClient.extendDocument(new ExtendDocumentDTO(signedDocument, parameters));
 
@@ -191,7 +194,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 
 	@Test
 	public void testSigningAndExtensionMultiDocuments() throws Exception {
-		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(Files.newInputStream(Paths.get("src/test/resources/user_a_rsa.p12")),
 				new PasswordProtection("password".toCharArray()))) {
 
 			List<DSSPrivateKeyEntry> keys = token.getKeys();
@@ -205,7 +208,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
-			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), "test.bin");
+			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes(StandardCharsets.UTF_8), "test.bin");
 			List<RemoteDocument> toSignDocuments = new ArrayList<>();
 			toSignDocuments.add(toSignDocument);
 			toSignDocuments.add(toSignDoc2);
@@ -235,7 +238,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	
 	@Test
 	public void testVisibleSignature() throws Exception {
-		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(Files.newInputStream(Paths.get("src/test/resources/user_a_rsa.p12")),
 				new PasswordProtection("password".toCharArray()))) {
 
 			List<DSSPrivateKeyEntry> keys = token.getKeys();
@@ -289,7 +292,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 
 	@Test
 	public void testVisibleSignatureWithTextLineBreaks() throws Exception {
-		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(Files.newInputStream(Paths.get("src/test/resources/user_a_rsa.p12")),
 				new PasswordProtection("password".toCharArray()))) {
 
 			List<DSSPrivateKeyEntry> keys = token.getKeys();
@@ -342,7 +345,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	
 	@Test
 	public void jadesParallelSigningTest() throws Exception {
-		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(Files.newInputStream(Paths.get("src/test/resources/user_a_rsa.p12")),
 				new PasswordProtection("password".toCharArray()))) {
 
 			List<DSSPrivateKeyEntry> keys = token.getKeys();
@@ -396,7 +399,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 
 	@Test
 	public void jadesMultiDocumentsSignTest() throws Exception {
-		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(Files.newInputStream(Paths.get("src/test/resources/user_a_rsa.p12")),
 				new PasswordProtection("password".toCharArray()))) {
 
 			List<DSSPrivateKeyEntry> keys = token.getKeys();
@@ -412,7 +415,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
-			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), "test.bin");
+			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes(StandardCharsets.UTF_8), "test.bin");
 			List<RemoteDocument> toSignDocuments = new ArrayList<>();
 			toSignDocuments.add(toSignDocument);
 			toSignDocuments.add(toSignDoc2);
@@ -434,7 +437,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	
 	@Test
 	public void jadesMultiDocsEnvelopingSignTest() throws Exception {
-		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(new FileInputStream("src/test/resources/user_a_rsa.p12"),
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(Files.newInputStream(Paths.get("src/test/resources/user_a_rsa.p12")),
 			new PasswordProtection("password".toCharArray()))) {
 
 			List<DSSPrivateKeyEntry> keys = token.getKeys();
@@ -449,7 +452,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	
 			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
 			RemoteDocument toSignDocument = new RemoteDocument(DSSUtils.toByteArray(fileToSign), fileToSign.getName());
-			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes("UTF-8"), "test.bin");
+			RemoteDocument toSignDoc2 = new RemoteDocument("Hello world!".getBytes(StandardCharsets.UTF_8), "test.bin");
 			List<RemoteDocument> toSignDocuments = new ArrayList<>();
 			toSignDocuments.add(toSignDocument);
 			toSignDocuments.add(toSignDoc2);
@@ -495,8 +498,8 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		assertNotNull(iMD);
 		
 		ASiCWithCAdESContainerExtractor extractor = new ASiCWithCAdESContainerExtractor(iMD);
-		ASiCExtractResult extractedResult = extractor.extract();
-		
+		ASiCContent extractedResult = extractor.extract();
+
 		assertEquals(1, extractedResult.getTimestampDocuments().size());
 		DSSDocument timestamp = extractedResult.getTimestampDocuments().get(0);
 		
@@ -539,8 +542,8 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 		assertNotNull(iMD);
 		
 		ASiCWithCAdESContainerExtractor extractor = new ASiCWithCAdESContainerExtractor(iMD);
-		ASiCExtractResult extractedResult = extractor.extract();
-		
+		ASiCContent extractedResult = extractor.extract();
+
 		assertEquals(1, extractedResult.getTimestampDocuments().size());
 		
 		List<DSSDocument> signedDocuments = extractedResult.getSignedDocuments();
@@ -563,7 +566,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	@Test
 	public void testCounterSignature() throws Exception {
 		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
-				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				Files.newInputStream(Paths.get("src/test/resources/user_a_rsa.p12")),
 				new PasswordProtection("password".toCharArray()))) {
 			List<DSSPrivateKeyEntry> keys = token.getKeys();
 			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
@@ -596,7 +599,7 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 	@Test
 	public void testPAdESCounterSign() throws Exception {
 		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(
-				new FileInputStream("src/test/resources/user_a_rsa.p12"),
+				Files.newInputStream(Paths.get("src/test/resources/user_a_rsa.p12")),
 				new PasswordProtection("password".toCharArray()))) {
 			List<DSSPrivateKeyEntry> keys = token.getKeys();
 			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
@@ -614,6 +617,38 @@ public class RestSignatureServiceIT extends AbstractRestIT {
 					parameters);
 			assertThrows(ServerErrorException.class,
 					() -> restClient.getDataToBeCounterSigned(dataToBeCounterSignedDTO));
+		}
+	}
+
+	@Test
+	public void testEmbedXmlSignature() throws Exception {
+		try (Pkcs12SignatureToken token = new Pkcs12SignatureToken(Files.newInputStream(Paths.get("src/test/resources/user_a_rsa.p12")),
+				new PasswordProtection("password".toCharArray()))) {
+
+			List<DSSPrivateKeyEntry> keys = token.getKeys();
+			DSSPrivateKeyEntry dssPrivateKeyEntry = keys.get(0);
+
+			RemoteSignatureParameters parameters = new RemoteSignatureParameters();
+			parameters.setSignatureLevel(SignatureLevel.XAdES_BASELINE_B);
+			parameters.setSigningCertificate(new RemoteCertificate(dssPrivateKeyEntry.getCertificate().getCertificate().getEncoded()));
+			parameters.setSignaturePackaging(SignaturePackaging.ENVELOPING);
+			parameters.setDigestAlgorithm(DigestAlgorithm.SHA256);
+			parameters.setEmbedXML(true);
+
+			FileDocument fileToSign = new FileDocument(new File("src/test/resources/sample.xml"));
+			RemoteDocument toSignDocument = new RemoteDocument(Utils.toByteArray(fileToSign.openStream()), fileToSign.getName());
+			ToBeSignedDTO dataToSign = restClient.getDataToSign(new DataToSignOneDocumentDTO(toSignDocument, parameters));
+			assertNotNull(dataToSign);
+
+			SignatureValue signatureValue = token.sign(DTOConverter.toToBeSigned(dataToSign), DigestAlgorithm.SHA256, dssPrivateKeyEntry);
+			SignOneDocumentDTO signDocument = new SignOneDocumentDTO(toSignDocument, parameters,
+					new SignatureValueDTO(signatureValue.getAlgorithm(), signatureValue.getValue()));
+			RemoteDocument signedDocument = restClient.signDocument(signDocument);
+			assertNotNull(signedDocument);
+
+			String documentContent = new String(signedDocument.getBytes());
+			assertTrue(documentContent.contains("<h:td>Hello</h:td>"));
+			assertTrue(documentContent.contains("<h:td>World</h:td>"));
 		}
 	}
 

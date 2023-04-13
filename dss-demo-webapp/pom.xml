@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-demos</artifactId>
-		<version>5.9</version>
+		<version>5.11.1</version>
 	</parent>
 
 	<artifactId>dss-demo-webapp</artifactId>
@@ -23,106 +23,11 @@
 		</resources>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-standalone-complete</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-									<artifactId>dss-standalone-app-package</artifactId>
-									<classifier>complete-zip</classifier>
-									<type>zip</type>
-									<outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
-									<destFileName>/downloads/dss-app-complete-windows-x64.zip</destFileName>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-					<execution>
-						<id>copy-standalone-minimal</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-									<artifactId>dss-standalone-app-package</artifactId>
-									<classifier>minimal-zip</classifier>
-									<type>zip</type>
-									<outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
-									<destFileName>/downloads/dss-app-minimal-windows-x64.zip</destFileName>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-			    <artifactId>maven-resources-plugin</artifactId>
-			    <executions>
-			        <execution>
-			            <id>copy-cookbook</id>
-						<phase>process-resources</phase>
-			            <goals>
-			                <goal>copy-resources</goal>
-			            </goals>
-			            <configuration>
-			                <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/doc</outputDirectory>
-			                <overwrite>true</overwrite>
-			                <resources>
-			                    <resource>
-			                        <directory>${dss.framework.root.directory}/dss-cookbook/target/generated-docs</directory>
-			                        <includes>
-			                            <include>**/*</include>
-			                            <include>*</include>
-			                        </includes>
-			                    </resource>
-			                </resources>
-			            </configuration>
-			        </execution>
-			        <execution>
-			            <id>copy-javadoc</id>
-						<phase>process-resources</phase>
-			            <goals>
-			                <goal>copy-resources</goal>
-			            </goals>
-			            <configuration>
-			                <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/apidocs</outputDirectory>
-			                <overwrite>true</overwrite>
-			                <resources>
-			                    <resource>
-			                        <directory>${dss.framework.root.directory}/target/site/apidocs</directory>
-			                        <includes>
-			                            <include>**/*</include>
-			                            <include>*</include>
-			                        </includes>
-			                    </resource>
-			                </resources>
-			            </configuration>
-			        </execution>
-			    </executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
 	            <configuration>
 	                <path>/</path>
 	            </configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
@@ -173,7 +78,7 @@
 		    <groupId>nz.net.ultraq.thymeleaf</groupId>
 		    <artifactId>thymeleaf-layout-dialect</artifactId>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>dss-mock-tsa</artifactId>
@@ -282,19 +187,23 @@
 			<artifactId>cxf-rt-features-logging</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>org.apache.cxf</groupId>
-		    <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
-		    <exclusions>
-		    	<exclusion>
-		    		<groupId>com.fasterxml.jackson.core</groupId>
-		    		<artifactId>jackson-databind</artifactId>
-		    	</exclusion>
-		    </exclusions>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.yaml</groupId>
+					<artifactId>snakeyaml</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
-	    	<groupId>org.webjars</groupId>
-	        <artifactId>swagger-ui</artifactId>
-	    </dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>swagger-ui</artifactId>
+		</dependency>
 		
 		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -415,26 +324,31 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
-    		<version>4.6.0-1</version>
+    		<version>4.6.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>font-awesome</artifactId>
 			<version>4.7.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>highlightjs</artifactId>
+			<version>11.5.0</version>
+		</dependency>
 
 		<!-- http://tomcat.apache.org/whichversion.html -->
 		<dependency>
 		    <groupId>javax.servlet</groupId>
 		    <artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
+			<version>4.0.1</version>
 		    <scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>6.2.0.Final</version>
+			<version>6.2.5.Final</version> <!-- 6 version to be used until javax to jakarta update -->
 		</dependency>
 		
 		<dependency>
@@ -447,7 +361,14 @@
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	    
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-core</artifactId>
+			<version>9.0.73</version>
+			<scope>test</scope>
+		</dependency>
+
+
 	</dependencies>
 
 	<profiles>
