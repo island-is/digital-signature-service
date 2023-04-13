@@ -61,7 +61,7 @@ import java.sql.SQLException;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
-@Import({ PropertiesConfig.class, CXFConfig.class, PersistenceConfig.class, ProxyConfiguration.class, WebSecurityConfig.class,
+@Import({ PropertiesConfig.class, CXFConfig.class, JdbcConfig.class, ProxyConfiguration.class, WebSecurityConfiguration.class,
 		SchedulingConfig.class })
 @ImportResource({ "${tsp-source}" })
 public class DSSBeanConfig {

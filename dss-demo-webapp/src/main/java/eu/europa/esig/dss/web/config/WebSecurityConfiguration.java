@@ -1,13 +1,17 @@
 package eu.europa.esig.dss.web.config;
 
 import eu.europa.esig.dss.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.firewall.RequestRejectedException;
+import org.springframework.security.web.firewall.RequestRejectedHandler;
 import org.springframework.security.web.header.HeaderWriter;
 import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
@@ -20,35 +24,40 @@ import org.springframework.web.servlet.handler.MappedInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collection;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfiguration {
+
+	private static final Logger LOG = LoggerFactory.getLogger(WebSecurityConfiguration.class);
 
 	@Value("${web.security.cookie.samesite}")
 	private String samesite;
 
 	@Value("${web.security.csp}")
 	private String csp;
-	
+
 	/** API urls (REST/SOAP webServices) */
 	private static final String[] API_URLS = new String[] {
 			"/services/rest/**", "/services/soap/**"
 	};
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		// javadoc uses frames
-		http.headers().addHeaderWriter(javadocHeaderWriter());
-		http.headers().addHeaderWriter(svgHeaderWriter());
-		http.headers().addHeaderWriter(serverEsigDSS());
-		
+		http.headers().addHeaderWriter(javadocHeaderWriter())
+				.addHeaderWriter(svgHeaderWriter())
+				.addHeaderWriter(serverEsigDSS());
+
 		http.csrf().ignoringAntMatchers(API_URLS); // disable CSRF for API calls (REST/SOAP webServices)
 
 		if (Utils.isStringNotEmpty(csp)) {
 			http.headers().contentSecurityPolicy(csp);
 		}
+
+		return http.build();
 	}
 
 	@Bean
@@ -64,7 +73,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		final HeaderWriter hw = new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN);
 		return new DelegatingRequestMatcherHeaderWriter(javadocAntPathRequestMatcher, hw);
 	}
-	
+
 	@Bean
 	public HeaderWriter serverEsigDSS() {
 		return new StaticHeadersWriter("Server", "ESIG-DSS");
@@ -100,6 +109,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				}
 			}
 		}
+	}
+
+	@Bean
+	public RequestRejectedHandler requestRejectedHandler() {
+		// Transforms Tomcat interrupted exceptions to a BAD_REQUEST error
+		return new RequestRejectedHandler() {
+			@Override
+			public void handle(HttpServletRequest request, HttpServletResponse response,
+							   RequestRejectedException requestRejectedException) throws IOException {
+				LOG.error("An error occurred : " + requestRejectedException.getMessage(), requestRejectedException);
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("Bad request : " + requestRejectedException.getMessage());
+			}
+		};
 	}
 
 }

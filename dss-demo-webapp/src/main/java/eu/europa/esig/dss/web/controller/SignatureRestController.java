@@ -1,15 +1,19 @@
 package eu.europa.esig.dss.web.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-public class SignatureStandaloneController {
+public class SignatureRestController {
 
-	@RequestMapping(value = "/signature-standalone", method = RequestMethod.GET)
-	public String getInfo() {
-		return "signature-standalone";
+	private static final String[] ALLOWED_FIELDS = { }; // nothing
+
+	@InitBinder
+	public void setAllowedFields(WebDataBinder webDataBinder) {
+		webDataBinder.setAllowedFields(ALLOWED_FIELDS);
 	}
 
 	@RequestMapping(value = "/signature-rest", method = RequestMethod.GET)
