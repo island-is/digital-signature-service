@@ -7,34 +7,40 @@ import org.springframework.context.annotation.Configuration;
 import eu.europa.esig.dss.service.http.proxy.ProxyConfig;
 import eu.europa.esig.dss.service.http.proxy.ProxyProperties;
 
+import java.util.Collection;
+
 @Configuration
 public class ProxyConfiguration {
 
-	@Value("${proxy.http.enabled}")
+	@Value("${proxy.http.enabled:false}")
 	private boolean httpEnabled;
-	@Value("${proxy.http.host}")
+	@Value("${proxy.http.host:}")
 	private String httpHost;
-	@Value("${proxy.http.port}")
+	@Value("${proxy.http.port:-1}")
 	private int httpPort;
-	@Value("${proxy.http.user}")
+	@Value("${proxy.http.scheme:}")
+	private String httpScheme;
+	@Value("${proxy.http.user:}")
 	private String httpUser;
-	@Value("${proxy.http.password}")
+	@Value("${proxy.http.password:}")
 	private String httpPassword;
-	@Value("${proxy.http.exclude}")
-	private String httpExcludedHosts;
+	@Value("#{T(java.util.Arrays).asList('${proxy.http.exclude:}')}")
+	private Collection<String> httpExcludedHosts;
 
-	@Value("${proxy.https.enabled}")
+	@Value("${proxy.https.enabled:false}")
 	private boolean httpsEnabled;
-	@Value("${proxy.https.host}")
+	@Value("${proxy.https.host:}")
 	private String httpsHost;
-	@Value("${proxy.https.port}")
+	@Value("${proxy.https.port:-1}")
 	private int httpsPort;
-	@Value("${proxy.https.user}")
+	@Value("${proxy.https.scheme:}")
+	private String httpsScheme;
+	@Value("${proxy.https.user:}")
 	private String httpsUser;
-	@Value("${proxy.https.password}")
+	@Value("${proxy.https.password:}")
 	private String httpsPassword;
-	@Value("${proxy.https.exclude}")
-	private String httpsExcludedHosts;
+	@Value("#{T(java.util.Arrays).asList('${proxy.https.exclude:}')}")
+	private Collection<String> httpsExcludedHosts;
 
 	@Bean
 	public ProxyConfig proxyConfig() {
