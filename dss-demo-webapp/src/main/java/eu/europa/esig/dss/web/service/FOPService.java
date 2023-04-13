@@ -35,7 +35,6 @@ public class FOPService {
 
 	@PostConstruct
 	public void init() throws Exception {
-
 		FopFactoryBuilder builder = new FopFactoryBuilder(new File(".").toURI(), new ClasspathResolver());
 		builder.setAccessibility(true);
 
@@ -50,7 +49,6 @@ public class FOPService {
 		foUserAgent = fopFactory.newFOUserAgent();
 		foUserAgent.setCreator("DSS Webapp");
 		foUserAgent.setAccessibility(true);
-
 	}
 
 	public void generateSimpleReport(String simpleReport, OutputStream os) throws Exception {
@@ -68,7 +66,7 @@ public class FOPService {
 	private static class ClasspathResolver implements ResourceResolver {
 
 		@Override
-		public Resource getResource(URI uri) throws IOException {
+		public Resource getResource(URI uri) {
 			return new Resource(FOPService.class.getResourceAsStream("/fonts/" + FilenameUtils.getName(uri.toString())));
 		}
 
