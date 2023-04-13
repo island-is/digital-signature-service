@@ -43,6 +43,7 @@
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
 		<dss.framework.version>5.11.1</dss.framework.version>
+		<dss.validation.rest.version>5.12.RC1</dss.validation.rest.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>2.0.6</slf4j.version>
@@ -242,6 +243,36 @@
 				<version>${dss.framework.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-validation-dto</artifactId>
+				<version>${dss.validation.rest.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-validation-server-common</artifactId>
+				<version>${dss.validation.rest.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-validation-rest</artifactId>
+				<version>${dss.validation.rest.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-certificate-validation-dto</artifactId>
+				<version>${dss.validation.rest.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-certificate-validation-common</artifactId>
+				<version>${dss.validation.rest.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+				<artifactId>dss-certificate-validation-rest</artifactId>
+				<version>${dss.validation.rest.version}</version>
 			</dependency>
 
 			<!-- Public Dependencies -->

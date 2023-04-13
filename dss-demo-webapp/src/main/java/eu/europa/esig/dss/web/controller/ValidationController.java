@@ -29,6 +29,7 @@ import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
+import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.exception.SourceNotFoundException;
 import eu.europa.esig.dss.web.model.ValidationForm;
 import eu.europa.esig.dss.web.service.FOPService;
@@ -51,7 +52,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,13 +61,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 @Controller
-@SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml" })
 @RequestMapping(value = "/validation")
 public class ValidationController extends AbstractValidationController {
 
@@ -166,7 +164,6 @@ public class ValidationController extends AbstractValidationController {
 			signingCertificateSource.addCertificate(signingCertificate);
 			documentValidator.setSigningCertificateSource(signingCertificateSource);
 		}
-
 	}
 
 	private CertificateVerifier getCertificateVerifier(ValidationForm certValidationForm) {
@@ -189,20 +186,20 @@ public class ValidationController extends AbstractValidationController {
 
 		Date start = new Date();
 		DSSDocument policyFile = WebAppUtils.toDSSDocument(validationForm.getPolicyFile());
-        if (!validationForm.isDefaultPolicy() && (policyFile != null)) {
-            try (InputStream is = policyFile.openStream()) {
-                reports = documentValidator.validateDocument(is);
+		if (!validationForm.isDefaultPolicy() && (policyFile != null)) {
+			try (InputStream is = policyFile.openStream()) {
+				reports = documentValidator.validateDocument(is);
 			} catch (IOException e) {
 				LOG.error(e.getMessage(), e);
 			}
 		} else if (defaultPolicy != null) {
-            try (InputStream is = defaultPolicy.getInputStream()) {
-                reports = documentValidator.validateDocument(is);
-            } catch (IOException e) {
-                LOG.error("Unable to parse policy : " + e.getMessage(), e);
-            }
+			try (InputStream is = defaultPolicy.getInputStream()) {
+				reports = documentValidator.validateDocument(is);
+			} catch (IOException e) {
+				throw new InternalServerException(String.format("Unable to parse policy: %s", e.getMessage()), e);
+			}
 		} else {
-			LOG.error("Not correctly initialized");
+			throw new IllegalStateException("Validation policy is not correctly initialized!");
 		}
 
 		Date end = new Date();
@@ -214,32 +211,29 @@ public class ValidationController extends AbstractValidationController {
 
 	@RequestMapping(value = "/download-simple-report")
 	public void downloadSimpleReport(HttpSession session, HttpServletResponse response) {
-		String simpleReport = (String) session.getAttribute(XML_SIMPLE_REPORT_ATTRIBUTE);
-		if (simpleReport == null) {
+		final String simpleReport = (String) session.getAttribute(XML_SIMPLE_REPORT_ATTRIBUTE);
+		if (Utils.isStringNotEmpty(simpleReport)) {
+			try {
+				response.setContentType(MimeType.PDF.getMimeTypeString());
+				response.setHeader("Content-Disposition", "attachment; filename=DSS-Simple-report.pdf");
+				fopService.generateSimpleReport(simpleReport, response.getOutputStream());
+			} catch (Exception e) {
+				LOG.error("An error occurred while generating pdf for simple report : " + e.getMessage(), e);
+			}
+		} else {
 			throw new SourceNotFoundException("Simple report not found");
-		}
-
-		try {
-			response.setContentType(MimeType.PDF.getMimeTypeString());
-			response.setHeader("Content-Disposition", "attachment; filename=DSS-Simple-report.pdf");
-
-			fopService.generateSimpleReport(simpleReport, response.getOutputStream());
-		} catch (Exception e) {
-			LOG.error("An error occurred while generating pdf for simple report : " + e.getMessage(), e);
 		}
 	}
 
 	@RequestMapping(value = "/download-detailed-report")
 	public void downloadDetailedReport(HttpSession session, HttpServletResponse response) {
-		String detailedReport = (String) session.getAttribute(XML_DETAILED_REPORT_ATTRIBUTE);
+		final String detailedReport = (String) session.getAttribute(XML_DETAILED_REPORT_ATTRIBUTE);
 		if (detailedReport == null) {
 			throw new SourceNotFoundException("Detailed report not found");
 		}
-
 		try {
 			response.setContentType(MimeType.PDF.getMimeTypeString());
 			response.setHeader("Content-Disposition", "attachment; filename=DSS-Detailed-report.pdf");
-
 			fopService.generateDetailedReport(detailedReport, response.getOutputStream());
 		} catch (Exception e) {
 			LOG.error("An error occurred while generating pdf for detailed report : " + e.getMessage(), e);
@@ -253,10 +247,12 @@ public class ValidationController extends AbstractValidationController {
 			throw new SourceNotFoundException("Diagnostic data not found");
 		}
 
-		try {
+		try (InputStream is = new ByteArrayInputStream(diagnosticData.getBytes());
+			 OutputStream os = response.getOutputStream()) {
 			response.setContentType(MimeType.XML.getMimeTypeString());
-			response.setHeader("Content-Disposition", "attachment; filename=DSS-Diagnotic-data.xml");
-			Utils.copy(new ByteArrayInputStream(diagnosticData.getBytes()), response.getOutputStream());
+			response.setHeader("Content-Disposition", "attachment; filename=DSS-Diagnostic-data.xml");
+			Utils.copy(is, os);
+
 		} catch (IOException e) {
 			LOG.error("An error occurred while downloading diagnostic data : " + e.getMessage(), e);
 		}
@@ -288,7 +284,7 @@ public class ValidationController extends AbstractValidationController {
 		String pemCert = DSSUtils.convertToPEM(DSSUtils.loadCertificate(certificate.getBinaries()));
 		String filename = DSSUtils.getNormalizedString(certificate.getReadableCertificateName()) + ".cer";
 
-		addTokenToResponse(response, filename, MimeType.CER, pemCert.getBytes());
+		addTokenToResponse(response, filename, pemCert.getBytes());
 	}
 
 	@RequestMapping(value = "/download-revocation")
@@ -302,11 +298,9 @@ public class ValidationController extends AbstractValidationController {
 			throw new SourceNotFoundException(message);
 		}
 		String filename = revocationData.getId();
-		MimeType mimeType;
 		byte[] binaries;
 
 		if (RevocationType.CRL.equals(revocationData.getRevocationType())) {
-			mimeType = MimeType.CRL;
 			filename += ".crl";
 
 			if (Utils.areStringsEqualIgnoreCase(format, "pem")) {
@@ -318,12 +312,11 @@ public class ValidationController extends AbstractValidationController {
 				binaries = revocationData.getBinaries();
 			}
 		} else {
-			mimeType = MimeType.BINARY;
 			filename += ".ocsp";
 			binaries = revocationData.getBinaries();
 		}
 
-		addTokenToResponse(response, filename, mimeType, binaries);
+		addTokenToResponse(response, filename, binaries);
 	}
 
 	@RequestMapping(value = "/download-timestamp")
@@ -349,7 +342,7 @@ public class ValidationController extends AbstractValidationController {
 		}
 
 		String filename = type.name() + ".tst";
-		addTokenToResponse(response, filename, MimeType.TST, binaries);
+		addTokenToResponse(response, filename, binaries);
 	}
 
 	protected DiagnosticData getDiagnosticData(HttpSession session) {
@@ -366,7 +359,7 @@ public class ValidationController extends AbstractValidationController {
 		return null;
 	}
 
-	protected void addTokenToResponse(HttpServletResponse response, String filename, MimeType mimeType, byte[] binaries) {
+	protected void addTokenToResponse(HttpServletResponse response, String filename, byte[] binaries) {
 		response.setContentType(MimeType.TST.getMimeTypeString());
 		response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 		try (InputStream is = new ByteArrayInputStream(binaries); OutputStream os = response.getOutputStream()) {
