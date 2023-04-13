@@ -417,6 +417,7 @@ public class DSSBeanConfig {
 		dataLoader.setTimeoutConnectionRequest(connectionRequestTimeout);
 		dataLoader.setRedirectsEnabled(redirectEnabled);
 		dataLoader.setProxyConfig(proxyConfig);
+		dataLoader.setSslProtocol("TLSv1.3");
 		return dataLoader;
 	}
 
