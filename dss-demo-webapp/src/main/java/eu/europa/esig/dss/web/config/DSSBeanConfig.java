@@ -12,17 +12,19 @@ import eu.europa.esig.dss.service.crl.OnlineCRLSource;
 import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
 import eu.europa.esig.dss.service.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.service.http.commons.OCSPDataLoader;
-import eu.europa.esig.dss.service.http.commons.SSLCertificateLoader;
 import eu.europa.esig.dss.service.http.proxy.ProxyConfig;
+import eu.europa.esig.dss.service.ocsp.JdbcCacheOCSPSource;
 import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
 import eu.europa.esig.dss.service.x509.aia.JdbcCacheAIASource;
 import eu.europa.esig.dss.spi.client.http.DSSFileLoader;
 import eu.europa.esig.dss.spi.client.http.IgnoreDataLoader;
-import eu.europa.esig.dss.spi.client.jdbc.JdbcCacheConnector;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.spi.x509.KeyStoreCertificateSource;
+import eu.europa.esig.dss.spi.x509.aia.AIASource;
 import eu.europa.esig.dss.spi.x509.aia.DefaultAIASource;
 import eu.europa.esig.dss.spi.x509.aia.OnlineAIASource;
+import eu.europa.esig.dss.spi.x509.revocation.crl.CRLSource;
+import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPSource;
 import eu.europa.esig.dss.spi.x509.tsp.TSPSource;
 import eu.europa.esig.dss.token.KeyStoreSignatureTokenConnection;
 import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
@@ -39,7 +41,7 @@ import eu.europa.esig.dss.ws.signature.common.RemoteMultipleDocumentsSignatureSe
 import eu.europa.esig.dss.ws.timestamp.remote.RemoteTimestampService;
 import eu.europa.esig.dss.ws.validation.common.RemoteDocumentValidationService;
 import eu.europa.esig.dss.xades.signature.XAdESService;
-import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,13 +53,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.io.ClassPathResource;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PasswordProtection;
-import java.sql.SQLException;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
@@ -101,8 +99,29 @@ public class DSSBeanConfig {
 	@Autowired
 	private TSPSource tspSource;
 
-	@Autowired
-	private DataSource dataSource;
+	@Autowired(required = false)
+	private JdbcCacheAIASource jdbcCacheAIASource;
+
+	@Autowired(required = false)
+	private JdbcCacheCRLSource jdbcCacheCRLSource;
+
+	@Autowired(required = false)
+	private JdbcCacheOCSPSource jdbcCacheOCSPSource;
+
+	@Value("${cache.expiration:0}")
+	private long cacheExpiration;
+
+	@Value("${cache.crl.default.next.update:0}")
+	private long crlDefaultNextUpdate;
+
+	@Value("${cache.crl.max.next.update:0}")
+	private long crlMaxNextUpdate;
+
+	@Value("${cache.ocsp.default.next.update:0}")
+	private long ocspDefaultNextUpdate;
+
+	@Value("${cache.ocsp.max.next.update:0}")
+	private long ocspMaxNextUpdate;
 
 	@Value("${dataloader.connection.timeout}")
 	private int connectionTimeout;
@@ -121,7 +140,7 @@ public class DSSBeanConfig {
 	}
 	
 	@Bean
-    public CommonsDataLoader trustAllDataLoader() {
+	public CommonsDataLoader trustAllDataLoader() {
 		CommonsDataLoader trustAllDataLoader = configureCommonsDataLoader(new CommonsDataLoader());
 		trustAllDataLoader.setTrustStrategy(TrustAllStrategy.INSTANCE);
 		return trustAllDataLoader;
@@ -134,6 +153,12 @@ public class DSSBeanConfig {
 
 	@Bean
 	public FileCacheDataLoader fileCacheDataLoader() {
+		FileCacheDataLoader fileCacheDataLoader = initFileCacheDataLoader();
+		fileCacheDataLoader.setCacheExpirationTime(cacheExpiration * 1000); // to millis
+		return fileCacheDataLoader;
+	}
+
+	private FileCacheDataLoader initFileCacheDataLoader() {
 		FileCacheDataLoader fileCacheDataLoader = new FileCacheDataLoader();
 		fileCacheDataLoader.setDataLoader(dataLoader());
 		// Per default uses "java.io.tmpdir" property
@@ -147,11 +172,13 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public JdbcCacheAIASource cachedAIASource() {
-		JdbcCacheAIASource jdbcCacheAIASource = new JdbcCacheAIASource();
-		jdbcCacheAIASource.setJdbcCacheConnector(jdbcCacheConnector());
-		jdbcCacheAIASource.setProxySource(onlineAIASource());
-		return jdbcCacheAIASource;
+	public AIASource cachedAIASource() {
+		if (jdbcCacheAIASource != null) {
+			jdbcCacheAIASource.setProxySource(onlineAIASource());
+			return jdbcCacheAIASource;
+		}
+		FileCacheDataLoader fileCacheDataLoader = fileCacheDataLoader();
+		return new DefaultAIASource(fileCacheDataLoader);
 	}
 
 	@Bean
@@ -162,24 +189,40 @@ public class DSSBeanConfig {
 	}
 
 	@Bean
-	public JdbcCacheCRLSource cachedCRLSource() {
-		JdbcCacheCRLSource jdbcCacheCRLSource = new JdbcCacheCRLSource();
-		jdbcCacheCRLSource.setJdbcCacheConnector(jdbcCacheConnector());
-		jdbcCacheCRLSource.setProxySource(onlineCRLSource());
-		jdbcCacheCRLSource.setDefaultNextUpdateDelay((long) (60 * 10)); // 10 minutes
-		return jdbcCacheCRLSource;
+	public CRLSource cachedCRLSource() {
+		if (jdbcCacheCRLSource != null) {
+			jdbcCacheCRLSource.setProxySource(onlineCRLSource());
+			jdbcCacheCRLSource.setDefaultNextUpdateDelay(crlDefaultNextUpdate);
+			jdbcCacheCRLSource.setMaxNextUpdateDelay(crlMaxNextUpdate);
+			return jdbcCacheCRLSource;
+		}
+		OnlineCRLSource onlineCRLSource = onlineCRLSource();
+		FileCacheDataLoader fileCacheDataLoader = initFileCacheDataLoader();
+		fileCacheDataLoader.setCacheExpirationTime(crlMaxNextUpdate * 1000); // to millis
+		onlineCRLSource.setDataLoader(fileCacheDataLoader);
+		return onlineCRLSource;
 	}
 
 	@Bean
-	public OnlineOCSPSource onlineOcspSource() {
+	public OnlineOCSPSource onlineOCSPSource() {
 		OnlineOCSPSource onlineOCSPSource = new OnlineOCSPSource();
 		onlineOCSPSource.setDataLoader(ocspDataLoader());
 		return onlineOCSPSource;
 	}
 
 	@Bean
-	public JdbcCacheConnector jdbcCacheConnector() {
-		return new JdbcCacheConnector(dataSource);
+	public OCSPSource cachedOCSPSource() {
+		if (jdbcCacheOCSPSource != null) {
+			jdbcCacheOCSPSource.setProxySource(onlineOCSPSource());
+			jdbcCacheOCSPSource.setDefaultNextUpdateDelay(ocspDefaultNextUpdate);
+			jdbcCacheOCSPSource.setMaxNextUpdateDelay(ocspMaxNextUpdate);
+			return jdbcCacheOCSPSource;
+		}
+		OnlineOCSPSource onlineOCSPSource = onlineOCSPSource();
+		FileCacheDataLoader fileCacheDataLoader = initFileCacheDataLoader();
+		fileCacheDataLoader.setCacheExpirationTime(ocspMaxNextUpdate * 1000); // to millis
+		onlineOCSPSource.setDataLoader(fileCacheDataLoader);
+		return onlineOCSPSource;
 	}
 
 	@Bean
@@ -198,7 +241,7 @@ public class DSSBeanConfig {
 	public CertificateVerifier certificateVerifier() {
 		CommonCertificateVerifier certificateVerifier = new CommonCertificateVerifier();
 		certificateVerifier.setCrlSource(cachedCRLSource());
-		certificateVerifier.setOcspSource(onlineOcspSource());
+		certificateVerifier.setOcspSource(cachedOCSPSource());
 		certificateVerifier.setAIASource(cachedAIASource());
 		certificateVerifier.setTrustedCertSources(trustedListSource());
 
@@ -353,7 +396,7 @@ public class DSSBeanConfig {
 	@Bean
 	public DSSFileLoader offlineLoader() {
 		FileCacheDataLoader offlineFileLoader = new FileCacheDataLoader();
-		offlineFileLoader.setCacheExpirationTime(Long.MAX_VALUE);
+		offlineFileLoader.setCacheExpirationTime(-1);
 		offlineFileLoader.setDataLoader(new IgnoreDataLoader());
 		offlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
 		return offlineFileLoader;
@@ -368,43 +411,6 @@ public class DSSBeanConfig {
 		}
 		return tslCache;
 	}
-
-	/* JDBC functions */
-
-	@PostConstruct
-	public void cachedAIASourceInitialization() throws SQLException {
-		JdbcCacheAIASource jdbcCacheAIASource = cachedAIASource();
-		jdbcCacheAIASource.initTable();
-	}
-
-	@PostConstruct
-	public void cachedCRLSourceInitialization() throws SQLException {
-		JdbcCacheCRLSource jdbcCacheCRLSource = cachedCRLSource();
-		jdbcCacheCRLSource.initTable();
-	}
-
-	@PreDestroy
-	public void cachedAIASourceClean() throws SQLException {
-		JdbcCacheAIASource jdbcCacheAIASource = cachedAIASource();
-		jdbcCacheAIASource.destroyTable();
-	}
-
-	@PreDestroy
-	public void cachedCRLSourceClean() throws SQLException {
-		JdbcCacheCRLSource jdbcCacheCRLSource = cachedCRLSource();
-		jdbcCacheCRLSource.destroyTable();
-	}
-
-	// Cached OCSPSource is not used
-	
-    /* QWAC Validation */
-
-    @Bean
-    public SSLCertificateLoader sslCertificateLoader() {
-        SSLCertificateLoader sslCertificateLoader = new SSLCertificateLoader();
-        sslCertificateLoader.setCommonsDataLoader(trustAllDataLoader());
-        return sslCertificateLoader;
-    }
 
 	private <C extends CommonsDataLoader> C configureCommonsDataLoader(C dataLoader) {
 		dataLoader.setTimeoutConnection(connectionTimeout);
