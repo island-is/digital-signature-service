@@ -33,6 +33,7 @@ import eu.europa.esig.dss.web.exception.InternalServerException;
 import eu.europa.esig.dss.web.exception.SourceNotFoundException;
 import eu.europa.esig.dss.web.model.ValidationForm;
 import eu.europa.esig.dss.web.service.FOPService;
+import eu.europa.esig.dss.web.service.ValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,6 +128,7 @@ public class ValidationController extends AbstractValidationController {
 				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens()));
 		documentValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
 		documentValidator.setSignaturePolicyProvider(signaturePolicyProvider);
+		ValidationService.configureDocumentValidator(documentValidator);
 
 		TokenIdentifierProvider identifierProvider = validationForm.isIncludeUserFriendlyIdentifiers() ?
 				new UserFriendlyIdentifierProvider() : new OriginalIdentifierProvider();
