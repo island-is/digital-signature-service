@@ -51,7 +51,7 @@
 
 		<cxf.version>3.5.5</cxf.version>
 		<swagger-ui.version>4.15.5</swagger-ui.version>
-		<spring.version>5.3.25</spring.version>
+		<spring.version>5.3.26</spring.version>
 		<spring-security.version>5.8.2</spring-security.version>
 		<thymeleaf-spring5.version>3.0.15.RELEASE</thymeleaf-spring5.version>
 		<thymeleaf-layout-dialect.version>3.2.1</thymeleaf-layout-dialect.version>
