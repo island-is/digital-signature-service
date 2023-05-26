@@ -84,7 +84,7 @@
 				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="24" />
 				<KeyUsage Level="WARN">
 					<Id>nonRepudiation</Id>
 				</KeyUsage>
@@ -195,7 +195,7 @@
 				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
 				<CA Level="FAIL" />
 				<MaxPathLength Level="FAIL" />
 				<KeyUsage Level="FAIL">
@@ -346,7 +346,7 @@
 				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="24" />
 				<KeyUsage Level="WARN">
 					<Id>nonRepudiation</Id>
 				</KeyUsage>
@@ -386,7 +386,7 @@
 				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
 				<CA Level="FAIL" />
 				<MaxPathLength Level="FAIL" />
 				<KeyUsage Level="FAIL">
@@ -480,7 +480,7 @@
 				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
 				<ExtendedKeyUsage Level="FAIL">
 					<Id>timeStamping</Id>
 				</ExtendedKeyUsage>
@@ -514,7 +514,7 @@
 				<AcceptableRevocationDataFound Level="WARN" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
 				<CA Level="FAIL" />
 				<MaxPathLength Level="FAIL" />
 				<KeyUsage Level="FAIL">
@@ -571,7 +571,7 @@
 				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
 				<PolicyTree Level="WARN" />
 				<NameConstraints Level="WARN" />
 				<SupportedCriticalExtensions Level="WARN">
@@ -599,7 +599,7 @@
 				<AcceptableRevocationDataFound Level="WARN" />
 				<CRLNextUpdatePresent Level="WARN" />
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
 				<CA Level="FAIL" />
 				<MaxPathLength Level="FAIL" />
 				<KeyUsage Level="FAIL">
