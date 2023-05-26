@@ -7,11 +7,11 @@ import eu.europa.esig.dss.diagnostic.RevocationWrapper;
 import eu.europa.esig.dss.diagnostic.TimestampWrapper;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
 import eu.europa.esig.dss.enumerations.DigestAlgorithm;
+import eu.europa.esig.dss.enumerations.MimeTypeEnum;
 import eu.europa.esig.dss.enumerations.RevocationType;
 import eu.europa.esig.dss.enumerations.TimestampType;
 import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
 import eu.europa.esig.dss.model.DSSDocument;
-import eu.europa.esig.dss.model.MimeType;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
 import eu.europa.esig.dss.spi.x509.CertificateSource;
@@ -216,7 +216,7 @@ public class ValidationController extends AbstractValidationController {
 		final String simpleReport = (String) session.getAttribute(XML_SIMPLE_REPORT_ATTRIBUTE);
 		if (Utils.isStringNotEmpty(simpleReport)) {
 			try {
-				response.setContentType(MimeType.PDF.getMimeTypeString());
+				response.setContentType(MimeTypeEnum.PDF.getMimeTypeString());
 				response.setHeader("Content-Disposition", "attachment; filename=DSS-Simple-report.pdf");
 				fopService.generateSimpleReport(simpleReport, response.getOutputStream());
 			} catch (Exception e) {
@@ -234,7 +234,7 @@ public class ValidationController extends AbstractValidationController {
 			throw new SourceNotFoundException("Detailed report not found");
 		}
 		try {
-			response.setContentType(MimeType.PDF.getMimeTypeString());
+			response.setContentType(MimeTypeEnum.PDF.getMimeTypeString());
 			response.setHeader("Content-Disposition", "attachment; filename=DSS-Detailed-report.pdf");
 			fopService.generateDetailedReport(detailedReport, response.getOutputStream());
 		} catch (Exception e) {
@@ -251,7 +251,7 @@ public class ValidationController extends AbstractValidationController {
 
 		try (InputStream is = new ByteArrayInputStream(diagnosticData.getBytes());
 			 OutputStream os = response.getOutputStream()) {
-			response.setContentType(MimeType.XML.getMimeTypeString());
+			response.setContentType(MimeTypeEnum.XML.getMimeTypeString());
 			response.setHeader("Content-Disposition", "attachment; filename=DSS-Diagnostic-data.xml");
 			Utils.copy(is, os);
 
@@ -268,7 +268,7 @@ public class ValidationController extends AbstractValidationController {
 		}
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf(MimeType.SVG.getMimeTypeString()));
+		headers.setContentType(MediaType.valueOf(MimeTypeEnum.SVG.getMimeTypeString()));
 		ResponseEntity<String> svgEntity = new ResponseEntity<>(xsltService.generateSVG(diagnosticData), headers,
 				HttpStatus.OK);
 		return svgEntity;
@@ -362,7 +362,7 @@ public class ValidationController extends AbstractValidationController {
 	}
 
 	protected void addTokenToResponse(HttpServletResponse response, String filename, byte[] binaries) {
-		response.setContentType(MimeType.TST.getMimeTypeString());
+		response.setContentType(MimeTypeEnum.TST.getMimeTypeString());
 		response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 		try (InputStream is = new ByteArrayInputStream(binaries); OutputStream os = response.getOutputStream()) {
 			Utils.copy(is, os);
