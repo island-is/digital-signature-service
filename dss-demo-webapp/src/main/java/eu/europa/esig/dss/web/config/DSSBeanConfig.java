@@ -225,6 +225,7 @@ public class DSSBeanConfig {
 		}
 		OnlineOCSPSource onlineOCSPSource = onlineOCSPSource();
 		FileCacheDataLoader fileCacheDataLoader = initFileCacheDataLoader();
+		fileCacheDataLoader.setDataLoader(ocspDataLoader());
 		fileCacheDataLoader.setCacheExpirationTime(ocspMaxNextUpdate * 1000); // to millis
 		onlineOCSPSource.setDataLoader(fileCacheDataLoader);
 		return onlineOCSPSource;
@@ -441,7 +442,6 @@ public class DSSBeanConfig {
 		dataLoader.setTimeoutConnectionRequest(connectionRequestTimeout);
 		dataLoader.setRedirectsEnabled(redirectEnabled);
 		dataLoader.setProxyConfig(proxyConfig);
-		dataLoader.setSslProtocol("TLSv1.3");
 		return dataLoader;
 	}
 

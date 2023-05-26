@@ -15,6 +15,7 @@ body {
 
 .footer {
 	height: 50px;
+	background-color: #f8f9fa;
 }
 
 .bg-primary, .header-highlight {

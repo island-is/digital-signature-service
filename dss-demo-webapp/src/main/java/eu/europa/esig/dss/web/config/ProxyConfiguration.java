@@ -1,5 +1,6 @@
 package eu.europa.esig.dss.web.config;
 
+import eu.europa.esig.dss.utils.Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,20 +51,46 @@ public class ProxyConfiguration {
 		ProxyConfig config = new ProxyConfig();
 		if (httpEnabled) {
 			ProxyProperties httpProperties = new ProxyProperties();
-			httpProperties.setHost(httpHost);
-			httpProperties.setPort(httpPort);
-			httpProperties.setUser(httpUser);
-			httpProperties.setPassword(httpPassword);
-			httpProperties.setExcludedHosts(httpExcludedHosts);
+			if (Utils.isStringNotEmpty(httpHost)) {
+				httpProperties.setHost(httpHost);
+			}
+			if (httpPort != -1) {
+				httpProperties.setPort(httpPort);
+			}
+			if (Utils.isStringNotEmpty(httpScheme)) {
+				httpProperties.setScheme(httpScheme);
+			}
+			if (Utils.isStringNotEmpty(httpUser)) {
+				httpProperties.setUser(httpUser);
+			}
+			if (Utils.isStringNotEmpty(httpPassword)) {
+				httpProperties.setPassword(httpPassword.toCharArray());
+			}
+			if (Utils.isCollectionNotEmpty(httpExcludedHosts)) {
+				httpProperties.setExcludedHosts(httpExcludedHosts);
+			}
 			config.setHttpProperties(httpProperties);
 		}
 		if (httpsEnabled) {
 			ProxyProperties httpsProperties = new ProxyProperties();
-			httpsProperties.setHost(httpsHost);
-			httpsProperties.setPort(httpsPort);
-			httpsProperties.setUser(httpsUser);
-			httpsProperties.setPassword(httpsPassword);
-			httpsProperties.setExcludedHosts(httpsExcludedHosts);
+			if (Utils.isStringNotEmpty(httpsHost)) {
+				httpsProperties.setHost(httpsHost);
+			}
+			if (httpsPort != -1) {
+				httpsProperties.setPort(httpsPort);
+			}
+			if (Utils.isStringNotEmpty(httpsScheme)) {
+				httpsProperties.setScheme(httpsScheme);
+			}
+			if (Utils.isStringNotEmpty(httpsUser)) {
+				httpsProperties.setUser(httpsUser);
+			}
+			if (Utils.isStringNotEmpty(httpsPassword)) {
+				httpsProperties.setPassword(httpsPassword.toCharArray());
+			}
+			if (Utils.isCollectionNotEmpty(httpsExcludedHosts)) {
+				httpsProperties.setExcludedHosts(httpsExcludedHosts);
+			}
 			config.setHttpsProperties(httpsProperties);
 		}
 		return config;
