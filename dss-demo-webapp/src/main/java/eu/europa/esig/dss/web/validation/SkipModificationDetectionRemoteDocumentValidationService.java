@@ -5,9 +5,9 @@ import eu.europa.esig.dss.web.service.ValidationService;
 import eu.europa.esig.dss.ws.validation.common.RemoteDocumentValidationService;
 import eu.europa.esig.dss.ws.validation.dto.DataToValidateDTO;
 
-public class SkipVisualValidationRemoteDocumentValidationService extends RemoteDocumentValidationService {
+public class SkipModificationDetectionRemoteDocumentValidationService extends RemoteDocumentValidationService {
 
-    public SkipVisualValidationRemoteDocumentValidationService() {
+    public SkipModificationDetectionRemoteDocumentValidationService() {
         super();
     }
 

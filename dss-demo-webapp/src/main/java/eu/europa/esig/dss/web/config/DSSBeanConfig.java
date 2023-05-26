@@ -33,7 +33,7 @@ import eu.europa.esig.dss.tsl.source.LOTLSource;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.CommonCertificateVerifier;
 import eu.europa.esig.dss.validation.SignaturePolicyProvider;
-import eu.europa.esig.dss.web.validation.SkipVisualValidationRemoteDocumentValidationService;
+import eu.europa.esig.dss.web.validation.SkipModificationDetectionRemoteDocumentValidationService;
 import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationService;
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnection;
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectionImpl;
@@ -334,7 +334,7 @@ public class DSSBeanConfig {
 
 	@Bean
 	public RemoteDocumentValidationService remoteValidationService() {
-		RemoteDocumentValidationService service = new SkipVisualValidationRemoteDocumentValidationService();
+		RemoteDocumentValidationService service = new SkipModificationDetectionRemoteDocumentValidationService();
 		service.setVerifier(certificateVerifier());
 		if (defaultPolicy() != null) {
 			try (InputStream is = defaultPolicy().getInputStream()) {
