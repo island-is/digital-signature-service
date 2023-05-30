@@ -5,7 +5,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>5.11.1</version>
+	<version>5.12</version>
 	<packaging>pom</packaging>
 	<name>Digital Signature Services - demonstrations</name>
 
@@ -42,29 +42,28 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.framework.version>5.11.1</dss.framework.version>
-		<dss.validation.rest.version>5.12.RC1</dss.validation.rest.version>
+		<dss.framework.version>5.12</dss.framework.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
-		<slf4j.version>2.0.6</slf4j.version>
-		<logback-classic.version>1.3.5</logback-classic.version> <!-- Version 1.4+ supports only Java 11+ -->
+		<slf4j.version>2.0.7</slf4j.version>
+		<logback-classic.version>1.3.7</logback-classic.version> <!-- Version 1.4+ supports only Java 11+ -->
 
-		<cxf.version>3.5.5</cxf.version>
-		<swagger-ui.version>4.15.5</swagger-ui.version>
-		<spring.version>5.3.26</spring.version>
-		<spring-security.version>5.8.2</spring-security.version>
+		<cxf.version>3.5.6</cxf.version>
+		<swagger-ui.version>4.18.2</swagger-ui.version>
+		<spring.version>5.3.27</spring.version>
+		<spring-security.version>5.8.3</spring-security.version>
 		<thymeleaf-spring5.version>3.0.15.RELEASE</thymeleaf-spring5.version>
 		<thymeleaf-layout-dialect.version>3.2.1</thymeleaf-layout-dialect.version>
-		<jackson-jaxrs-json-provider.version>2.14.2</jackson-jaxrs-json-provider.version>
+		<jackson-jaxrs-json-provider.version>2.15.1</jackson-jaxrs-json-provider.version>
 		<commons-fileupload.version>1.5</commons-fileupload.version>
-		<commons-io.version>2.11.0</commons-io.version>
+		<commons-io.version>2.12.0</commons-io.version>
 		<hikaricp.version>4.0.3</hikaricp.version> <!-- Higher version does not support Java 8 -->
 		<freemarker.version>2.3.32</freemarker.version>
 		<hsqldb.version>2.5.2</hsqldb.version> <!-- Higher version does not support Java 8 -->
 		<fop-core.version>2.8</fop-core.version>
 		<nexu.version>1.22</nexu.version>
 
-		<junit.jupiter.version>5.9.2</junit.jupiter.version>
+		<junit.jupiter.version>5.9.3</junit.jupiter.version>
 	</properties>
 
 	<licenses>
@@ -99,7 +98,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.2.1</version>
+				<version>3.3.0</version>
 				<executions>
 					<execution>
 						<id>enforce</id>
@@ -138,22 +137,22 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.10.1</version>
+					<version>3.11.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>3.2.1</version>
+					<version>3.3.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
-					<version>3.1.0</version>
+					<version>3.1.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
-					<version>3.3.0</version>
+					<version>3.3.1</version>
 					<configuration>
 						<encoding>${project.encoding}</encoding>
 						<nonFilteredFileExtensions><!-- Avoid to modify keystore -->
@@ -170,17 +169,17 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-shade-plugin</artifactId>
+						<artifactId>maven-shade-plugin</artifactId>
 					<version>3.4.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
-					<version>3.4.2</version>
+					<version>3.6.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-release-plugin</artifactId>
+						<artifactId>maven-release-plugin</artifactId>
 					<version>2.5.3</version>
 					<configuration>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
@@ -200,7 +199,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.0.0-M9</version>
+					<version>3.1.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -219,21 +218,6 @@
 				<type>war</type>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-standalone-app</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-standalone-app-package</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-                <groupId>eu.europa.ec.joinup.sd-dss</groupId>
-                <artifactId>sscd-mocca-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
 			<!-- DSS Framework dependencies -->
 
@@ -243,36 +227,6 @@
 				<version>${dss.framework.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-validation-dto</artifactId>
-				<version>${dss.validation.rest.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-validation-server-common</artifactId>
-				<version>${dss.validation.rest.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-validation-rest</artifactId>
-				<version>${dss.validation.rest.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-certificate-validation-dto</artifactId>
-				<version>${dss.validation.rest.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-certificate-validation-common</artifactId>
-				<version>${dss.validation.rest.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-				<artifactId>dss-certificate-validation-rest</artifactId>
-				<version>${dss.validation.rest.version}</version>
 			</dependency>
 
 			<!-- Public Dependencies -->
@@ -483,7 +437,7 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>8.1.0</version>
+						<version>8.2.1</version>
 						<executions>
 							<execution>
 								<goals>

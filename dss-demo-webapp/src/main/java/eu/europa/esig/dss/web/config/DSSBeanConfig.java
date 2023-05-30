@@ -33,7 +33,7 @@ import eu.europa.esig.dss.tsl.source.LOTLSource;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.CommonCertificateVerifier;
 import eu.europa.esig.dss.validation.SignaturePolicyProvider;
-import eu.europa.esig.dss.web.validation.SkipVisualValidationRemoteDocumentValidationService;
+import eu.europa.esig.dss.web.validation.SkipModificationDetectionRemoteDocumentValidationService;
 import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationService;
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnection;
 import eu.europa.esig.dss.ws.server.signing.common.RemoteSignatureTokenConnectionImpl;
@@ -225,6 +225,7 @@ public class DSSBeanConfig {
 		}
 		OnlineOCSPSource onlineOCSPSource = onlineOCSPSource();
 		FileCacheDataLoader fileCacheDataLoader = initFileCacheDataLoader();
+		fileCacheDataLoader.setDataLoader(ocspDataLoader());
 		fileCacheDataLoader.setCacheExpirationTime(ocspMaxNextUpdate * 1000); // to millis
 		onlineOCSPSource.setDataLoader(fileCacheDataLoader);
 		return onlineOCSPSource;
@@ -333,7 +334,7 @@ public class DSSBeanConfig {
 
 	@Bean
 	public RemoteDocumentValidationService remoteValidationService() {
-		RemoteDocumentValidationService service = new SkipVisualValidationRemoteDocumentValidationService();
+		RemoteDocumentValidationService service = new SkipModificationDetectionRemoteDocumentValidationService();
 		service.setVerifier(certificateVerifier());
 		if (defaultPolicy() != null) {
 			try (InputStream is = defaultPolicy().getInputStream()) {
@@ -441,7 +442,6 @@ public class DSSBeanConfig {
 		dataLoader.setTimeoutConnectionRequest(connectionRequestTimeout);
 		dataLoader.setRedirectsEnabled(redirectEnabled);
 		dataLoader.setProxyConfig(proxyConfig);
-		dataLoader.setSslProtocol("TLSv1.3");
 		return dataLoader;
 	}
 

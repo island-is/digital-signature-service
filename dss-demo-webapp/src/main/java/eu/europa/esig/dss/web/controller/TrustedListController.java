@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,6 +28,13 @@ public class TrustedListController {
 	private static final String PIVOT_CHANGES = "pivot-changes";
 	private static final String TL_DATA = "tl-info-country";
 	private static final String LOTL_DATA = "lotl-info";
+
+	private static final String[] ALLOWED_FIELDS = { }; // nothing
+
+	@InitBinder
+	public void setAllowedFields(WebDataBinder webDataBinder) {
+		webDataBinder.setAllowedFields(ALLOWED_FIELDS);
+	}
 
 	@Autowired
 	private TrustedListsCertificateSource trustedCertificateSource;

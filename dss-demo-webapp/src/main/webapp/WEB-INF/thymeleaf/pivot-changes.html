@@ -18,7 +18,7 @@
 					<li><i class="fa fa-circle text-danger" aria-hidden="true"></i>&nbsp;<span>Removed certificate from the source by the pivot;</span></li>
 					<li><i class="fa fa-circle text-info" aria-hidden="true"></i>&nbsp;<span>The signing certificate of the LOTL.</span></li>
 				</ul>
-				<p>The initial LOTL-signing certificates can be found on the <a href="/oj-certificates" th:text="#{label.eu.oj.certificates.page}"></a> page.</p>
+				<p>The initial LOTL-signing certificates can be found on the <a th:href="@{/oj-certificates}" th:text="#{label.eu.oj.certificates.page}"></a> page.</p>
 				</div>
 			</div>
 		
@@ -27,8 +27,9 @@
 				<h2>
 					<span th:if="${lotl.parsingCacheInfo != null and lotl.parsingCacheInfo.resultExist and lotl.parsingCacheInfo.territory != null}"
 							th:class="${'lotl-flag small_flag mt-2 flag_' + lotl.parsingCacheInfo.territory}" th:title="${lotl.parsingCacheInfo.territory}"></span>
-					<span th:text="#{label.summary.lotl}"></span>&nbsp;
-					<a class="lotl-url h5 font-weight-bold" th:href="${lotl.url}" th:text="'(' + (${lotl.url}?:'-') + ')'" target="_blank"></a>
+					<span th:text="#{label.summary.lotl}"></span>
+					<a class="h4" th:if="${lotl.parsingCacheInfo.TSLType != null}" th:text="'(' + (${lotl.parsingCacheInfo.TSLType.label != null ? lotl.parsingCacheInfo.TSLType.label : lotl.parsingCacheInfo.TSLType.uri}) + ')'" th:href="${lotl.parsingCacheInfo.TSLType.uri}" target="_blank"></a>
+					<a class="lotl-url h6" th:href="${lotl.url}" th:text="${lotl.url}?:'-'" target="_blank"></a>
 				</h2>
 			</div>
 		

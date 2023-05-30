@@ -22,6 +22,15 @@
 		<SignedFilesPresent Level="FAIL" />
 		<AllFilesSigned Level="WARN" />
 	</ContainerConstraints>
+	<PDFAConstraints>
+		<!-- PDF/A only -->
+		<!--		<AcceptablePDFAProfiles Level="WARN">-->
+		<!--			<Id>PDF/A-2A</Id>-->
+		<!--			<Id>PDF/A-2B</Id>-->
+		<!--			<Id>PDF/A-2U</Id>-->
+		<!--		</AcceptablePDFAProfiles>-->
+		<!--		<PDFACompliant Level="WARN" />-->
+	</PDFAConstraints>
 	<SignatureConstraints>
 		<StructuralValidation Level="WARN" />
 		<AcceptablePolicies Level="FAIL">
@@ -44,13 +53,17 @@
 			<SignatureDuplicated Level="FAIL" />
 			<ProspectiveCertificateChain Level="FAIL" />
 			<SignerInformationStore Level="FAIL" />
-			<PdfPageDifference Level="FAIL" />
+			<ByteRange Level="FAIL" />
+			<ByteRangeCollision Level="WARN" />
+			<PdfSignatureDictionary Level="FAIL" />
+			<!-- Disable PDF modification checks -->
+			<!-- <PdfPageDifference Level="FAIL" />
 			<PdfAnnotationOverlap Level="WARN" />
-<!--			<PdfVisualDifference Level="WARN" /> -->
+			<PdfVisualDifference Level="WARN" />
 			<DocMDP Level="WARN" />
 			<FieldMDP Level="WARN" />
 			<SigFieldLock Level="WARN" />
-			<UndefinedChanges Level="WARN" />
+			<UndefinedChanges Level="WARN" /> -->
 <!-- 			<TrustedServiceTypeIdentifier Level="WARN"> -->
 <!-- 				<Id>http://uri.etsi.org/TrstSvc/Svctype/CA/QC</Id> -->
 <!-- 			</TrustedServiceTypeIdentifier> -->
@@ -70,20 +83,32 @@
 				<RevocationDataAvailable Level="FAIL" />
 				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
-<!--				Checking if OCSP responses contain a nextUpdate field is needed: 
-						From RFC 6960:
-						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
-					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent constraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="24" />
 				<KeyUsage Level="WARN">
 					<Id>nonRepudiation</Id>
 				</KeyUsage>
+				<PolicyTree Level="WARN" />
+				<NameConstraints Level="WARN" />
+				<SupportedCriticalExtensions Level="WARN">
+					<Id>2.5.29.15</Id> <!-- keyUsage -->
+					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
+					<Id>2.5.29.17</Id> <!-- subjectAlternativeName -->
+					<Id>2.5.29.19</Id> <!-- basicConstraints -->
+					<Id>2.5.29.30</Id> <!-- nameConstraints -->
+					<Id>2.5.29.36</Id> <!-- policyConstraints -->
+					<Id>2.5.29.37</Id> <!-- extendedKeyUsage -->
+					<Id>2.5.29.31</Id> <!-- CRLDistributionPoints -->
+					<Id>2.5.29.54</Id> <!-- inhibitAnyPolicy -->
+					<Id>1.3.6.1.5.5.7.1.3</Id> <!-- QCStatements -->
+					<!-- policyMappings 2.5.29.33 not supported -->
+				</SupportedCriticalExtensions>
+				<ForbiddenExtensions Level="FAIL">
+					<Id>1.3.6.1.5.5.7.48.1.5</Id> <!-- ocsp_noCheck -->
+				</ForbiddenExtensions>
 				<SerialNumberPresent Level="WARN" />
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
-<!--				The check RevocationIssuerNotExpired was introduced in DSS v5.9 to support the implementation of the new sub-indication REVOCATION_OUT_OF_BOUNDS_NO_POE introduced in the EN 319 102-1 v1.3.1
-					The check must be present, else the process is not compliant to this version (v1.3.1) of the EN. In particular, this new sub-indication was introduced to fix an issue in the EN where expired (and thus unusable) revocation data were not rejected by the validation process in v1.2.1 -->
 				<RevocationIssuerNotExpired Level="FAIL" />
 				<NotSelfSigned Level="WARN" />
 <!--				<QcCompliance Level="WARN" /> -->
@@ -122,7 +147,7 @@
 						<Algo>RIPEMD160</Algo>
 						<Algo>WHIRLPOOL</Algo>
 					</AcceptableDigestAlgo>
-					<AlgoExpirationDate Format="yyyy">
+					<AlgoExpirationDate Level="FAIL" Format="yyyy" UpdateDate="2022" LevelAfterUpdate="WARN">
 						<!-- Digest algorithms -->
 						<!--		<Algo Date="2005">MD2</Algo> 		Not referenced in ETSI/SOGIS -->
 						<Algo Date="2005">MD5</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.1.1 -->
@@ -169,12 +194,31 @@
 				<RevocationDataAvailable Level="FAIL" />
 				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
-<!--				Checking if OCSP responses contain a nextUpdate field is needed: 
-						From RFC 6960:
-						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
-					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
+				<CA Level="FAIL" />
+				<MaxPathLength Level="FAIL" />
+				<KeyUsage Level="FAIL">
+					<Id>keyCertSign</Id>
+				</KeyUsage>
+				<PolicyTree Level="WARN" />
+				<NameConstraints Level="WARN" />
+				<SupportedCriticalExtensions Level="WARN">
+					<Id>2.5.29.15</Id> <!-- keyUsage -->
+					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
+					<Id>2.5.29.17</Id> <!-- subjectAlternativeName -->
+					<Id>2.5.29.19</Id> <!-- basicConstraints -->
+					<Id>2.5.29.30</Id> <!-- nameConstraints -->
+					<Id>2.5.29.36</Id> <!-- policyConstraints -->
+					<Id>2.5.29.37</Id> <!-- extendedKeyUsage -->
+					<Id>2.5.29.31</Id> <!-- CRLDistributionPoints -->
+					<Id>2.5.29.54</Id> <!-- inhibitAnyPolicy -->
+					<Id>1.3.6.1.5.5.7.1.3</Id> <!-- QCStatements -->
+					<!-- policyMappings 2.5.29.33 not supported -->
+				</SupportedCriticalExtensions>
+				<ForbiddenExtensions Level="FAIL">
+					<Id>1.3.6.1.5.5.7.48.1.5</Id> <!-- ocsp_noCheck -->
+				</ForbiddenExtensions>
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<Cryptographic Level="FAIL">
@@ -207,7 +251,7 @@
 						<Algo>RIPEMD160</Algo>
 						<Algo>WHIRLPOOL</Algo>
 					</AcceptableDigestAlgo>
-					<AlgoExpirationDate Format="yyyy">
+					<AlgoExpirationDate Level="FAIL" Format="yyyy" UpdateDate="2022" LevelAfterUpdate="WARN">
 						<!-- Digest algorithms -->
 						<!--		<Algo Date="2005">MD2</Algo> 		Not referenced in ETSI/SOGIS -->
 						<Algo Date="2005">MD5</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.1.1 -->
@@ -262,6 +306,7 @@
 			<KeyIdentifierMatch Level="WARN" />
 			<SigningTime Level="FAIL" />
 			<MessageDigestOrSignedPropertiesPresent Level="FAIL" />
+			<EllipticCurveKeySize Level="WARN" />
 <!--		<ContentType Level="FAIL" value="1.2.840.113549.1.7.1" /> -->
 <!--		<ContentHints Level="FAIL" value="*" /> -->
 			<CommitmentTypeIndication Level="FAIL">
@@ -300,15 +345,29 @@
 				<RevocationDataAvailable Level="FAIL" />
 				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
-<!--				Checking if OCSP responses contain a nextUpdate field is needed: 
-						From RFC 6960:
-						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
-					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="24" />
 				<KeyUsage Level="WARN">
 					<Id>nonRepudiation</Id>
 				</KeyUsage>
+				<PolicyTree Level="WARN" />
+				<NameConstraints Level="WARN" />
+				<SupportedCriticalExtensions Level="WARN">
+					<Id>2.5.29.15</Id> <!-- keyUsage -->
+					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
+					<Id>2.5.29.17</Id> <!-- subjectAlternativeName -->
+					<Id>2.5.29.19</Id> <!-- basicConstraints -->
+					<Id>2.5.29.30</Id> <!-- nameConstraints -->
+					<Id>2.5.29.36</Id> <!-- policyConstraints -->
+					<Id>2.5.29.37</Id> <!-- extendedKeyUsage -->
+					<Id>2.5.29.31</Id> <!-- CRLDistributionPoints -->
+					<Id>2.5.29.54</Id> <!-- inhibitAnyPolicy -->
+					<Id>1.3.6.1.5.5.7.1.3</Id> <!-- QCStatements -->
+					<!-- policyMappings 2.5.29.33 not supported -->
+				</SupportedCriticalExtensions>
+				<ForbiddenExtensions Level="FAIL">
+					<Id>1.3.6.1.5.5.7.48.1.5</Id> <!-- ocsp_noCheck -->
+				</ForbiddenExtensions>
 				<SerialNumberPresent Level="WARN" />
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
@@ -326,12 +385,31 @@
 				<RevocationDataAvailable Level="FAIL" />
 				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
-<!--				Checking if OCSP responses contain a nextUpdate field is needed: 
-						From RFC 6960:
-						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
-					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="FAIL" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
+				<CA Level="FAIL" />
+				<MaxPathLength Level="FAIL" />
+				<KeyUsage Level="FAIL">
+					<Id>keyCertSign</Id>
+				</KeyUsage>
+				<PolicyTree Level="WARN" />
+				<NameConstraints Level="WARN" />
+				<SupportedCriticalExtensions Level="WARN">
+					<Id>2.5.29.15</Id> <!-- keyUsage -->
+					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
+					<Id>2.5.29.17</Id> <!-- subjectAlternativeName -->
+					<Id>2.5.29.19</Id> <!-- basicConstraints -->
+					<Id>2.5.29.30</Id> <!-- nameConstraints -->
+					<Id>2.5.29.36</Id> <!-- policyConstraints -->
+					<Id>2.5.29.37</Id> <!-- extendedKeyUsage -->
+					<Id>2.5.29.31</Id> <!-- CRLDistributionPoints -->
+					<Id>2.5.29.54</Id> <!-- inhibitAnyPolicy -->
+					<Id>1.3.6.1.5.5.7.1.3</Id> <!-- QCStatements -->
+					<!-- policyMappings 2.5.29.33 not supported -->
+				</SupportedCriticalExtensions>
+				<ForbiddenExtensions Level="FAIL">
+					<Id>1.3.6.1.5.5.7.48.1.5</Id> <!-- ocsp_noCheck -->
+				</ForbiddenExtensions>
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<Cryptographic />
@@ -372,6 +450,17 @@
 			<ReferenceDataIntact Level="FAIL" />
 			<SignatureIntact Level="FAIL" />
 			<ProspectiveCertificateChain Level="FAIL" />
+			<ByteRange Level="FAIL" />
+			<ByteRangeCollision Level="WARN" />
+			<PdfSignatureDictionary Level="FAIL" />
+			<!-- Disable PDF modification checks -->
+			<!-- <PdfPageDifference Level="FAIL" />
+			<PdfAnnotationOverlap Level="WARN" />
+			<PdfVisualDifference Level="WARN" />
+			<DocMDP Level="WARN" />
+			<FieldMDP Level="WARN" />
+			<SigFieldLock Level="WARN" />
+			<UndefinedChanges Level="WARN" /> -->
 			<TrustedServiceTypeIdentifier Level="FAIL">
 				<Id>http://uri.etsi.org/TrstSvc/Svctype/TSA/QTST</Id>
 			</TrustedServiceTypeIdentifier>
@@ -390,15 +479,29 @@
 				<RevocationDataAvailable Level="FAIL" />
 				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
-<!--				Checking if OCSP responses contain a nextUpdate field is needed: 
-						From RFC 6960:
-						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
-					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="-24" />
-				<ExtendedKeyUsage Level="WARN">
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
+				<ExtendedKeyUsage Level="FAIL">
 					<Id>timeStamping</Id>
 				</ExtendedKeyUsage>
+				<PolicyTree Level="WARN" />
+				<NameConstraints Level="WARN" />
+				<SupportedCriticalExtensions Level="WARN">
+					<Id>2.5.29.15</Id> <!-- keyUsage -->
+					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
+					<Id>2.5.29.17</Id> <!-- subjectAlternativeName -->
+					<Id>2.5.29.19</Id> <!-- basicConstraints -->
+					<Id>2.5.29.30</Id> <!-- nameConstraints -->
+					<Id>2.5.29.36</Id> <!-- policyConstraints -->
+					<Id>2.5.29.37</Id> <!-- extendedKeyUsage -->
+					<Id>2.5.29.31</Id> <!-- CRLDistributionPoints -->
+					<Id>2.5.29.54</Id> <!-- inhibitAnyPolicy -->
+					<Id>1.3.6.1.5.5.7.1.3</Id> <!-- QCStatements -->
+					<!-- policyMappings 2.5.29.33 not supported -->
+				</SupportedCriticalExtensions>
+				<ForbiddenExtensions Level="FAIL">
+					<Id>1.3.6.1.5.5.7.48.1.5</Id> <!-- ocsp_noCheck -->
+				</ForbiddenExtensions>
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<NotSelfSigned Level="WARN" />
@@ -410,12 +513,31 @@
 				<RevocationDataAvailable Level="WARN" />
 				<AcceptableRevocationDataFound Level="WARN" />
 				<CRLNextUpdatePresent Level="WARN" />
-<!--				Checking if OCSP responses contain a nextUpdate field is needed: 
-						From RFC 6960:
-						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
-					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
+				<CA Level="FAIL" />
+				<MaxPathLength Level="FAIL" />
+				<KeyUsage Level="FAIL">
+					<Id>keyCertSign</Id>
+				</KeyUsage>
+				<PolicyTree Level="WARN" />
+				<NameConstraints Level="WARN" />
+				<SupportedCriticalExtensions Level="WARN">
+					<Id>2.5.29.15</Id> <!-- keyUsage -->
+					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
+					<Id>2.5.29.17</Id> <!-- subjectAlternativeName -->
+					<Id>2.5.29.19</Id> <!-- basicConstraints -->
+					<Id>2.5.29.30</Id> <!-- nameConstraints -->
+					<Id>2.5.29.36</Id> <!-- policyConstraints -->
+					<Id>2.5.29.37</Id> <!-- extendedKeyUsage -->
+					<Id>2.5.29.31</Id> <!-- CRLDistributionPoints -->
+					<Id>2.5.29.54</Id> <!-- inhibitAnyPolicy -->
+					<Id>1.3.6.1.5.5.7.1.3</Id> <!-- QCStatements -->
+					<!-- policyMappings 2.5.29.33 not supported -->
+				</SupportedCriticalExtensions>
+				<ForbiddenExtensions Level="FAIL">
+					<Id>1.3.6.1.5.5.7.48.1.5</Id> <!-- ocsp_noCheck -->
+				</ForbiddenExtensions>
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<Cryptographic />
@@ -434,6 +556,7 @@
 	</Timestamp>
 	<Revocation>
         <UnknownStatus Level="FAIL" />
+		<OCSPResponderIdMatch Level="FAIL" />
         <SelfIssuedOCSP Level="WARN" />
 		<BasicSignatureConstraints>
 			<ReferenceDataExistence Level="FAIL" />
@@ -447,12 +570,24 @@
 				<RevocationDataAvailable Level="FAIL" />
 				<AcceptableRevocationDataFound Level="FAIL" />
 				<CRLNextUpdatePresent Level="WARN" />
-<!--				Checking if OCSP responses contain a nextUpdate field is needed: 
-						From RFC 6960:
-						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
-					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
+				<PolicyTree Level="WARN" />
+				<NameConstraints Level="WARN" />
+				<SupportedCriticalExtensions Level="WARN">
+					<Id>2.5.29.15</Id> <!-- keyUsage -->
+					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
+					<Id>2.5.29.17</Id> <!-- subjectAlternativeName -->
+					<Id>2.5.29.19</Id> <!-- basicConstraints -->
+					<Id>2.5.29.30</Id> <!-- nameConstraints -->
+					<Id>2.5.29.36</Id> <!-- policyConstraints -->
+					<Id>2.5.29.37</Id> <!-- extendedKeyUsage -->
+					<Id>2.5.29.31</Id> <!-- CRLDistributionPoints -->
+					<Id>2.5.29.54</Id> <!-- inhibitAnyPolicy -->
+					<Id>1.3.6.1.5.5.7.1.3</Id> <!-- QCStatements -->
+					<Id>1.3.6.1.5.5.7.48.1.5</Id> <!-- ocsp_noCheck -->
+					<!-- policyMappings 2.5.29.33 not supported -->
+				</SupportedCriticalExtensions>
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<Cryptographic />
@@ -463,12 +598,31 @@
 				<RevocationDataAvailable Level="WARN" />
 				<AcceptableRevocationDataFound Level="WARN" />
 				<CRLNextUpdatePresent Level="WARN" />
-<!--				Checking if OCSP responses contain a nextUpdate field is needed: 
-						From RFC 6960:
-						If nextUpdate is not set, the responder is indicating that newer revocation information is available all the time.
-					DSS v5.9 Introduced the split into CRL and OCSP from the previous RevocationDataNextUpdatePresent contraint to explicitly avoid checking the nextUpdate field presence in OCSP responses-->
 <!--				<OCSPNextUpdatePresent Level="WARN" /> -->
-				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="-24" />
+				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
+				<CA Level="FAIL" />
+				<MaxPathLength Level="FAIL" />
+				<KeyUsage Level="FAIL">
+					<Id>keyCertSign</Id>
+				</KeyUsage>
+				<PolicyTree Level="WARN" />
+				<NameConstraints Level="WARN" />
+				<SupportedCriticalExtensions Level="WARN">
+					<Id>2.5.29.15</Id> <!-- keyUsage -->
+					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
+					<Id>2.5.29.17</Id> <!-- subjectAlternativeName -->
+					<Id>2.5.29.19</Id> <!-- basicConstraints -->
+					<Id>2.5.29.30</Id> <!-- nameConstraints -->
+					<Id>2.5.29.36</Id> <!-- policyConstraints -->
+					<Id>2.5.29.37</Id> <!-- extendedKeyUsage -->
+					<Id>2.5.29.31</Id> <!-- CRLDistributionPoints -->
+					<Id>2.5.29.54</Id> <!-- inhibitAnyPolicy -->
+					<Id>1.3.6.1.5.5.7.1.3</Id> <!-- QCStatements -->
+					<!-- policyMappings 2.5.29.33 not supported -->
+				</SupportedCriticalExtensions>
+				<ForbiddenExtensions Level="FAIL">
+					<Id>1.3.6.1.5.5.7.48.1.5</Id> <!-- ocsp_noCheck -->
+				</ForbiddenExtensions>
 				<NotRevoked Level="FAIL" />
 				<NotOnHold Level="FAIL" />
 				<Cryptographic />
@@ -506,7 +660,7 @@
 			<Algo>RIPEMD160</Algo>
 			<Algo>WHIRLPOOL</Algo>
 		</AcceptableDigestAlgo>
-		<AlgoExpirationDate Format="yyyy">
+		<AlgoExpirationDate Level="FAIL" Format="yyyy" UpdateDate="2022" LevelAfterUpdate="WARN">
 			<!-- Digest algorithms -->
 <!--		<Algo Date="2005">MD2</Algo> 		Not referenced in ETSI/SOGIS -->
 			<Algo Date="2005">MD5</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.1.1 -->
