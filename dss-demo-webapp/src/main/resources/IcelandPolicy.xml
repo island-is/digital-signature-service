@@ -309,9 +309,9 @@
 			<EllipticCurveKeySize Level="WARN" />
 <!--		<ContentType Level="FAIL" value="1.2.840.113549.1.7.1" /> -->
 <!--		<ContentHints Level="FAIL" value="*" /> -->
-			<CommitmentTypeIndication Level="FAIL">
+<!--		<CommitmentTypeIndication Level="FAIL">
 				<Id>1.2.840.113549.1.9.16.6.5</Id>
-			</CommitmentTypeIndication>
+			</CommitmentTypeIndication> -->
 <!--		<SignerLocation Level="FAIL" /> -->
 <!--		<ContentTimeStamp Level="FAIL" /> -->
 		</SignedAttributes>
