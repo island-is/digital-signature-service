@@ -1,5 +1,6 @@
 package eu.europa.esig.dss.web.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -360,15 +361,17 @@ public class CXFConfig {
     
 	/**
 	 * ObjectMappers configures a proper way for (un)marshalling of json data
+	 *
 	 * @return {@link ObjectMapper}
 	 */
 	@Bean
 	public ObjectMapper objectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
-		// true value allows to process {@code @IDREF}s cycles
+		// true value allows processing of {@code @IDREF}s cycles
 		JaxbAnnotationIntrospector jai = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());
 		objectMapper.setAnnotationIntrospector(jai);
 		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		objectMapper.configure(DeserializationFeature.WRAP_EXCEPTIONS, false);
 		return objectMapper;
 	}
 	

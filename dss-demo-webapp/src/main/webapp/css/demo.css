@@ -95,11 +95,20 @@ form#digest-sign-form p#filename {
 
 /* PDF signature */
 
-form#sign-pdf-form p#filename {
+.large-field {
   line-height: 200px;
+  height: 200px;
 }
 
 /* End PDF signature */
+
+/* Signature validation */
+
+.tooltip-inner {
+    white-space: pre-wrap;
+}
+
+/* End Signature validation */
 
 /* Certificate validation */
 
@@ -204,6 +213,11 @@ form#sign-pdf-form p#filename {
     background-color: rgba(255,255,255,.35);
 }
 
+pre.prettyprint {
+     border: 1px solid rgba(0,0,0,.125);
+     border-radius: 0.25rem;
+ }
+
 /* End Validation reports */
 
 /* Mobile devices */
@@ -230,7 +244,7 @@ form#sign-pdf-form p#filename {
         width: auto;
         padding: 0;
     }
-    form#sign-pdf-form p#filename {
+    .large-field {
       line-height: 64px;
     }
 }
