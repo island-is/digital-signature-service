@@ -441,7 +441,7 @@
 		</SignedAttributes>
 	</CounterSignatureConstraints>
 	<Timestamp>
-		<TimestampDelay Level="FAIL" Unit="SECONDS" Value="30" />
+		<TimestampDelay Level="FAIL" Unit="SECONDS" Value="120" />
 		<RevocationTimeAgainstBestSignatureTime	Level="FAIL" />
 		<BestSignatureTimeBeforeExpirationDateOfSigningCertificate Level="FAIL" />
 		<Coherence Level="WARN" />
