@@ -3,8 +3,9 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
 
-	<meta name="_csrf" th:content="${_csrf.token}"/>
-	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<!-- Disabled CSRF for testing purposes -->
+<!--	<meta name="_csrf" th:content="${_csrf.token}"/>-->
+<!--	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>-->
 	
 	<link rel="icon" type="image/png" th:href="@{/images/favicon.ico}" sizes="16x16">
 	<title th:text="#{application.title}">Digital Signature Services</title>
