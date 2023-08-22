@@ -52,7 +52,8 @@ public class WebSecurityConfiguration {
 				.addHeaderWriter(svgHeaderWriter())
 				.addHeaderWriter(serverEsigDSS());
 
-		http.csrf().ignoringRequestMatchers(getAntMatchers()); // disable CSRF for API calls (REST/SOAP webServices)
+		//http.csrf().ignoringRequestMatchers(getAntMatchers()); // disable CSRF for API calls (REST/SOAP webServices)
+		http.csrf().disable(); // to be not used in production
 
 		if (Utils.isStringNotEmpty(csp)) {
 			http.headers().contentSecurityPolicy(csp);
