@@ -99,11 +99,11 @@
 						<Algo>RIPEMD160</Algo>
 						<Algo>WHIRLPOOL</Algo>
 					</AcceptableDigestAlgo>
-					<AlgoExpirationDate Level="FAIL" Format="yyyy" UpdateDate="2022" LevelAfterUpdate="WARN">
+					<AlgoExpirationDate Level="FAIL" Format="yyyy" UpdateDate="2016" LevelAfterUpdate="WARN">
 						<!-- Digest algorithms -->
 						<!--		<Algo Date="2005">MD2</Algo> 		Not referenced in ETSI/SOGIS -->
 						<Algo Date="2005">MD5</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.1.1 -->
-						<Algo Date="2026">SHA1</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.0.0 -->
+						<Algo Date="2017">SHA1</Algo> <!-- Modified for Digital Iceland to return a warning on SHA-1 usage -->
 						<Algo Date="2026">SHA224</Algo> <!-- ETSI 119 312 V1.4.2 -->
 						<Algo Date="2029">SHA256</Algo> <!-- ETSI 119 312 V1.4.2 -->
 						<Algo Date="2029">SHA384</Algo> <!-- ETSI 119 312 V1.4.2 -->
@@ -201,11 +201,11 @@
 						<Algo>RIPEMD160</Algo>
 						<Algo>WHIRLPOOL</Algo>
 					</AcceptableDigestAlgo>
-					<AlgoExpirationDate Level="FAIL" Format="yyyy" UpdateDate="2022" LevelAfterUpdate="WARN">
+					<AlgoExpirationDate Level="FAIL" Format="yyyy" UpdateDate="2016" LevelAfterUpdate="WARN">
 						<!-- Digest algorithms -->
 						<!--		<Algo Date="2005">MD2</Algo> 		Not referenced in ETSI/SOGIS -->
 						<Algo Date="2005">MD5</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.1.1 -->
-						<Algo Date="2026">SHA1</Algo> <!-- ETSI TS 102 176-1 (Historical) V2.0.0 -->
+						<Algo Date="2017">SHA1</Algo> <!-- Modified for Digital Iceland to return a warning on SHA-1 usage -->
 						<Algo Date="2026">SHA224</Algo> <!-- ETSI 119 312 V1.4.2 -->
 						<Algo Date="2029">SHA256</Algo> <!-- ETSI 119 312 V1.4.2 -->
 						<Algo Date="2029">SHA384</Algo> <!-- ETSI 119 312 V1.4.2 -->
