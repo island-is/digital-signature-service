@@ -1,4 +1,4 @@
-FROM maven:3.9.1-eclipse-temurin-11 as build
+FROM maven:3.9.2-eclipse-temurin-11 as build
 
 COPY pom.xml /usr/src/mymaven/
 COPY dss-demo-bundle/pom.xml /usr/src/mymaven/dss-demo-bundle/
