@@ -15,7 +15,7 @@ COPY dss-demo-webapp/src /usr/src/mymaven/dss-demo-webapp/src
 
 WORKDIR /usr/src/mymaven
 
-RUN mvn --quiet clean package --projects dss-mock-tsa,dss-demo-webapp --activate-profiles quick
+RUN mvn clean package --projects dss-mock-tsa,dss-demo-webapp --activate-profiles quick
 
 
 FROM docker.io/tomcat:9 as runner
