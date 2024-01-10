@@ -6,7 +6,29 @@
 			</pattern>
 		</encoder>
 	</appender>
-	
+
+	<appender name="JSON_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.JsonEncoder"/>
+	</appender>
+
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>logs/app.log</file>
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+  </appender>
+
+  <appender name="JSON_TCP" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+    <destination>tcp-intake.logs.datadoghq.eu:443</destination>
+    <keepAliveDuration>20 seconds</keepAliveDuration>
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+        <prefix class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>${DD_API_KEY} %mdc{keyThatDoesNotExist}</pattern>
+            </layout>
+          </prefix>
+    </encoder>
+    <ssl />
+  </appender>
+
 	<logger name="eu.europa.esig.dss" level="INFO" />
 	<logger name="org.apache" level="INFO" />
 	<logger name="org.apache.fop" level="ERROR" />
@@ -14,6 +36,9 @@
 	<logger name="org.springframework" level="INFO" />
 
 	<root level="debug">
-		<appender-ref ref="STDOUT" />
+    <!-- <appender-ref ref="FILE"/> -->
+    <!-- <appender-ref ref="JSON_TCP" /> -->
+		<!-- <appender-ref ref="STDOUT" /> -->
+		<appender-ref ref="JSON_STDOUT" />
 	</root>
 </configuration>
