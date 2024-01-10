@@ -7,10 +7,15 @@
 		</encoder>
 	</appender>
 
+	<appender name="JSON_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.JsonEncoder"/>
+	</appender>
+
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>logs/app.log</file>
     <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
   </appender>
+
   <appender name="JSON_TCP" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
     <destination>tcp-intake.logs.datadoghq.eu:443</destination>
     <keepAliveDuration>20 seconds</keepAliveDuration>
@@ -31,8 +36,9 @@
 	<logger name="org.springframework" level="INFO" />
 
 	<root level="debug">
-    <appender-ref ref="FILE"/>
-    <appender-ref ref="JSON_TCP" />
-		<appender-ref ref="STDOUT" />
+    <!-- <appender-ref ref="FILE"/> -->
+    <!-- <appender-ref ref="JSON_TCP" /> -->
+		<!-- <appender-ref ref="STDOUT" /> -->
+		<appender-ref ref="JSON_STDOUT" />
 	</root>
 </configuration>
