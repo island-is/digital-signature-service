@@ -1,7 +1,7 @@
 # Bust cache monthly
 ARG CACHE_BUST=$(date +%Y-%m)
 
-FROM docker.io/maven:3.9.1-eclipse-temurin-11 as build
+FROM docker.io/maven:3.9.6-eclipse-temurin-11 as build
 
 COPY pom.xml /usr/src/mymaven/
 COPY dss-demo-bundle/pom.xml /usr/src/mymaven/dss-demo-bundle/
