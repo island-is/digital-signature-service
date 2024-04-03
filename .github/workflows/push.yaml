@@ -33,7 +33,6 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_ECR_ARN }}
-          role-session-name: DSS GitHub
           aws-region: eu-west-1
 
       - name: Login to Amazon ECR
