@@ -53,7 +53,7 @@ jobs:
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
       - uses: nelonoel/branch-name@v1.0.1
       - name: Trigger Deployment for service
-        # if: github.ref == 'refs/heads/main'
+        if: ${{ github.ref == 'refs/heads/main' }}
         env:
           SPINNAKER_WEBHOOK_TOKEN: ${{ secrets.SPINNAKER_WEBHOOK_TOKEN }}
         run: |
