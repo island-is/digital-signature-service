@@ -9,8 +9,8 @@
 
 	<logger name="eu.europa.esig.dss" level="INFO" />
 	<logger name="org.apache" level="INFO" />
-	<logger name="org.apache.fop" level="INFO" />
-	<logger name="org.apache.pdfbox" level="INFO" />
+	<logger name="org.apache.fop" level="ERROR" />
+	<logger name="org.apache.pdfbox" level="ERROR" />
 	<logger name="org.springframework" level="INFO" />
 
 	<root level="debug">
