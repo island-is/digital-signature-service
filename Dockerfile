@@ -19,11 +19,14 @@ FROM tomcat:9
 
 RUN apt-get update && apt-get upgrade -y
 
+# Adding neccessary libraries for centralized logging configuration (datadog java agent, and components for jason output for catalina/tomcat logs from the
+# ECS-Based logging https://github.com/elastic/ecs-logging-java/blob/main/jul-ecs-formatter/src/main/java/co/elastic/logging/jul/EcsFormatter.java)
 RUN wget -O dd-java-agent.jar https://dtdg.co/latest-java-tracer && \
     wget -O /usr/local/tomcat/bin/jul-ecs-formatter-1.6.0.jar https://repo1.maven.org/maven2/co/elastic/logging/jul-ecs-formatter/1.6.0/jul-ecs-formatter-1.6.0.jar && \
     wget -O /usr/local/tomcat/bin/ecs-logging-core-1.6.0.jar https://repo1.maven.org/maven2/co/elastic/logging/ecs-logging-core/1.6.0/ecs-logging-core-1.6.0.jar
 
 COPY setenv.sh /usr/local/tomcat/bin
+
 
 COPY --from=build /usr/src/mymaven/dss-demo-webapp/target/dss-demo-webapp-*.war /usr/local/tomcat/webapps/ROOT.war
 COPY dss-demo-webapp/src/main/resources/config/logging.properties /usr/local/tomcat/conf/logging.properties
