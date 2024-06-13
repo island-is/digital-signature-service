@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}" th:with="currentPage=#{label.rest.soap.webservices}">
+	<body>		
+		<div layout:fragment="content">
+            <p>
+                DSS offers&nbsp;
+                <a th:href="@{/services/}" title="eSignature REST/SOAP WebServices" target="_blank">REST and SOAP WebServices</a>&nbsp;
+                with the following functions :
+            </p>
+            <ul>
+            	<li>Document validation
+	            	<ul>
+	            		<li>Validate a document (signed or timestamped);</li>
+	            		<li>Retrieve an original signed document.</li>
+	            	</ul>
+            	</li>
+            	<li>Certificate validation
+	            	<ul>
+	            		<li>Validate a certificate.</li>
+	            	</ul>
+	            </li>
+            </ul>
+
+            <p>These services hide the signature complexity (CAdES, PAdES, XAdES, JAdES, ASiC) and made integration easier.</p>
+            <p>Since DSS v5.6, the REST WebServices are compliant with <a href="https://www.openapis.org/" target="_blank">OpenAPI Specification</a>.</p>
+		</div>
+		
+	</body>
+</html>

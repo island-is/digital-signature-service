@@ -1,0 +1,19 @@
+<th:block th:fragment="menu" xmlns:th="http://www.thymeleaf.org">
+
+    <div class="card">
+        <div class="card-header bg-primary">e-Signature</div>
+        <div class="list-group list-group-flush">
+            <a th:with="label=#{label.rest.soap.services}" th:href="@{/signature-rest}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+        </div>
+    </div>
+    
+    <div class="card mt-3">
+        <div class="card-header bg-primary">Server side</div>
+        <div class="list-group list-group-flush">
+            <a th:with="label=#{label.validate}" th:href="@{/validation}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.tsls.summary}" th:href="@{/tl-info}" th:text="${label}" class="list-group-item" th:classappend="${currentPage == label} ? 'active'"></a>
+            <a th:with="label=#{label.eu.oj.certificates}, pageTitle=#{label.eu.oj.certificates.page}" th:href="@{/oj-certificates}" class="list-group-item" th:text="${label}" th:classappend="${currentPage == pageTitle} ? 'active'"></a>
+        </div>
+    </div>
+
+</th:block>
