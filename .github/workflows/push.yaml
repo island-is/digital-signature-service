@@ -51,7 +51,7 @@ jobs:
           tags: "${{ env.DOCKER_REGISTRY }}/dss:${{ github.sha }},${{ env.DOCKER_REGISTRY }}/dss:latest"
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
-      - uses: island.is/branch-name@v1
+      - uses: island-is/branch-name@v1
       #- name: Get Branch Name
         #run: echo "BRANCH_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Print Branch Name
