@@ -46,12 +46,12 @@
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>2.0.7</slf4j.version>
-		<logback-classic.version>1.3.7</logback-classic.version> <!-- Version 1.4+ supports only Java 11+ -->
+		<logback-classic.version>1.3.12</logback-classic.version> <!-- Version 1.4+ supports only Java 11+ -->
 
 		<cxf.version>3.5.6</cxf.version>
 		<swagger-ui.version>4.18.2</swagger-ui.version>
 		<spring.version>5.3.27</spring.version>
-		<spring-security.version>5.8.3</spring-security.version>
+		<spring-security.version>5.8.7</spring-security.version>
 		<thymeleaf-spring5.version>3.0.15.RELEASE</thymeleaf-spring5.version>
 		<thymeleaf-layout-dialect.version>3.2.1</thymeleaf-layout-dialect.version>
 		<jackson-jaxrs-json-provider.version>2.15.1</jackson-jaxrs-json-provider.version>
@@ -59,7 +59,7 @@
 		<commons-io.version>2.12.0</commons-io.version>
 		<hikaricp.version>4.0.3</hikaricp.version> <!-- Higher version does not support Java 8 -->
 		<freemarker.version>2.3.32</freemarker.version>
-		<hsqldb.version>2.5.2</hsqldb.version> <!-- Higher version does not support Java 8 -->
+		<hsqldb.version>2.7.1</hsqldb.version> <!-- Higher version does not support Java 8 -->
 		<fop-core.version>2.8</fop-core.version>
 		<nexu.version>1.22</nexu.version>
 
