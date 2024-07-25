@@ -54,15 +54,15 @@
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<slf4j.version>2.0.13</slf4j.version>
-		<logback-classic.version>1.3.14</logback-classic.version> <!-- Version 1.4+ supports only Java 11+ -->
+		<logback-classic.version>1.5.6</logback-classic.version>
 
 		<cxf.version>4.0.4</cxf.version>
 		<swagger-ui.version>5.17.14</swagger-ui.version>
 		<jackson-jakarta-rs-json-provider.version>2.17.1</jackson-jakarta-rs-json-provider.version>
 		<commons-io.version>2.16.1</commons-io.version>
-		<hikaricp.version>4.0.3</hikaricp.version> <!-- Higher version does not support Java 8 -->
+		<hikaricp.version>5.1.0</hikaricp.version>
 		<freemarker.version>2.3.32</freemarker.version>
-		<hsqldb.version>2.5.2</hsqldb.version> <!-- Higher version does not support Java 8 -->
+		<hsqldb.version>2.7.3</hsqldb.version>
 		<fop-core.version>2.9</fop-core.version>
 		<nexu.version>1.22</nexu.version>
 

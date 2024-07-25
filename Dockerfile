@@ -2,7 +2,7 @@
 FROM maven:3.9.7-eclipse-temurin-21 AS build
 COPY . /app
 WORKDIR /app
-RUN mvn clean install -P quick
+RUN mvn package -P quick
 
 # Second stage: create and run JAVA app
 FROM eclipse-temurin:21
