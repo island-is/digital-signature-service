@@ -1,6 +1,9 @@
 package eu.europa.esig.dss.web.config;
 
 import eu.europa.esig.dss.alert.ExceptionOnStatusAlert;
+import eu.europa.esig.dss.alert.detector.AlertDetector;
+import eu.europa.esig.dss.alert.handler.AlertHandler;
+import eu.europa.esig.dss.enumerations.Indication;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.service.crl.JdbcCacheCRLSource;
 import eu.europa.esig.dss.service.crl.OnlineCRLSource;
@@ -13,12 +16,14 @@ import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
 import eu.europa.esig.dss.service.x509.aia.JdbcCacheAIASource;
 import eu.europa.esig.dss.spi.client.http.DSSFileLoader;
 import eu.europa.esig.dss.spi.client.http.IgnoreDataLoader;
+import eu.europa.esig.dss.spi.tsl.TLInfo;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.spi.x509.KeyStoreCertificateSource;
 import eu.europa.esig.dss.spi.x509.aia.AIASource;
 import eu.europa.esig.dss.spi.x509.aia.DefaultAIASource;
 import eu.europa.esig.dss.spi.x509.revocation.crl.CRLSource;
 import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPSource;
+import eu.europa.esig.dss.tsl.alerts.TLAlert;
 import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
@@ -43,6 +48,7 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
@@ -123,6 +129,12 @@ public class DSSBeanConfig {
 	private boolean redirectEnabled;
 	@Value("${dataloader.use.system.properties}")
 	private boolean useSystemProperties;
+
+	@Value("${is.country.code}")
+	private String icelandCountryCode;
+
+	@Value("${is.distribution.point}")
+	private String icelandDistributionPoint;
 
 	// can be null
 	@Autowired(required = false)
@@ -301,6 +313,7 @@ public class DSSBeanConfig {
 		job.setListOfTrustedListSources(europeanLOTL());
 		job.setOfflineDataLoader(offlineLoader());
 		job.setOnlineDataLoader(onlineLoader());
+		job.setTLAlerts(Collections.singletonList(new IcelandFailureTLAlert()));
 		return job;
 	}
 
@@ -365,6 +378,41 @@ public class DSSBeanConfig {
 		dataLoader.setUseSystemProperties(useSystemProperties);
 		dataLoader.setProxyConfig(proxyConfig);
 		return dataLoader;
+	}
+
+	private final class IcelandFailureTLAlert extends TLAlert {
+
+		private static final Logger LOG = LoggerFactory.getLogger(IcelandFailureTLAlert.class);
+
+		public IcelandFailureTLAlert() {
+			super(new AlertDetector<TLInfo>() {
+				@Override
+				public boolean detect(TLInfo tlInfo) {
+					return icelandDistributionPoint.equals(tlInfo.getUrl()) ||
+							(tlInfo.getParsingCacheInfo() != null && icelandCountryCode.equals(tlInfo.getParsingCacheInfo().getTerritory()));
+				}
+			}, new AlertHandler<TLInfo>() {
+				@Override
+				public void process(TLInfo tlInfo) {
+					if (tlInfo.getDownloadCacheInfo() != null && tlInfo.getDownloadCacheInfo().isError()) {
+						LOG.error("An error occurred during Iceland Trusted List (IS TL) download : {}", tlInfo.getDownloadCacheInfo().getExceptionMessage());
+					}
+					if (tlInfo.getParsingCacheInfo() != null && tlInfo.getParsingCacheInfo().isError()) {
+						LOG.error("An error occurred during Iceland Trusted List (IS TL) parsing : {}", tlInfo.getParsingCacheInfo().getExceptionMessage());
+					}
+					if (tlInfo.getValidationCacheInfo() != null) {
+						if (tlInfo.getValidationCacheInfo().isError()) {
+							LOG.error("An error occurred during Iceland Trusted List (IS TL) validation : {}", tlInfo.getValidationCacheInfo().getExceptionMessage());
+						}
+						if (Indication.TOTAL_PASSED != tlInfo.getValidationCacheInfo().getIndication()) {
+							LOG.error("Validation of Iceland Trusted List (IS TL) finished with the result : {}/{}",
+									tlInfo.getValidationCacheInfo().getIndication(), tlInfo.getValidationCacheInfo().getSubIndication());
+						}
+					}
+				}
+			});
+		}
+
 	}
 
 }
