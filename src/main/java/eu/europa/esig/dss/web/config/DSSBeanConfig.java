@@ -22,6 +22,7 @@ import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPSource;
 import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.CommonCertificateVerifier;
 import eu.europa.esig.dss.validation.SignaturePolicyProvider;
@@ -77,6 +78,9 @@ public class DSSBeanConfig {
 
 	@Value("${tl.loader.trust.all}")
 	private boolean tlTrustAllStrategy;
+
+	@Value("${tl.loader.cache.folder:}")
+	private String tlCacheFolder;
 
 	@Value("${dss.server.signing.keystore.type}")
 	private String serverSigningKeystoreType;
@@ -340,8 +344,14 @@ public class DSSBeanConfig {
 
 	@Bean
 	public File tlCacheDirectory() {
-		File rootFolder = new File(System.getProperty("java.io.tmpdir"));
-		File tslCache = new File(rootFolder, "dss-tsl-loader");
+		File tslCache;
+		if (Utils.isStringEmpty(tlCacheFolder)) {
+			// create temp folder
+			File rootFolder = new File(System.getProperty("java.io.tmpdir"));
+			tslCache = new File(rootFolder, "dss-tsl-loader");
+		} else {
+			tslCache = new File(tlCacheFolder);
+		}
 		if (tslCache.mkdirs()) {
 			LOG.info("TL Cache folder : {}", tslCache.getAbsolutePath());
 		}
