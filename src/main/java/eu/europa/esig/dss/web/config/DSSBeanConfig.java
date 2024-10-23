@@ -29,9 +29,9 @@ import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPSource;
 import eu.europa.esig.dss.tsl.alerts.TLAlert;
 import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
-import eu.europa.esig.dss.tsl.sha2.Sha2FileCacheDataLoader;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
 import eu.europa.esig.dss.utils.Utils;
+import eu.europa.esig.dss.web.job.sha2.Sha2FileCacheDataLoaderDebug;
 import eu.europa.esig.dss.web.validation.SkipModificationDetectionRemoteDocumentValidationService;
 import eu.europa.esig.dss.ws.cert.validation.common.RemoteCertificateValidationService;
 import eu.europa.esig.dss.ws.validation.common.RemoteDocumentValidationService;
@@ -324,7 +324,7 @@ public class DSSBeanConfig {
 		onlineFileLoader.setCacheExpirationTime(-1);
 		onlineFileLoader.setDataLoader(tlDataLoader());
 		onlineFileLoader.setFileCacheDirectory(tlCacheDirectory());
-		return Sha2FileCacheDataLoader.initSha2DailyUpdateDataLoader(onlineFileLoader);
+		return Sha2FileCacheDataLoaderDebug.initSha2DailyUpdateDataLoader(onlineFileLoader);
 	}
 
 	@Bean
