@@ -1,27 +1,41 @@
 package eu.europa.esig.dss.web.model;
 
+import eu.europa.esig.dss.enumerations.ValidationLevel;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.executor.ValidationLevel;
+import eu.europa.esig.dss.web.validation.AssertMultipartFile;
 import jakarta.validation.constraints.AssertTrue;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 
 public class ValidationForm {
 
+	@AssertMultipartFile
 	private MultipartFile signedFile;
 
+	@AssertMultipartFile
 	private List<OriginalFile> originalFiles;
+
+	private Date validationTime;
+
+	private int timezoneDifference;
 
 	private ValidationLevel validationLevel;
 
 	private boolean defaultPolicy;
 
+	@AssertMultipartFile
 	private MultipartFile policyFile;
-	
+
+	@AssertMultipartFile
 	private MultipartFile signingCertificate;
 
+	@AssertMultipartFile
 	private List<MultipartFile> adjunctCertificates;
+
+	@AssertMultipartFile
+	private List<MultipartFile> evidenceRecordFiles;
 	
 	private boolean includeCertificateTokens;
 	
@@ -55,6 +69,30 @@ public class ValidationForm {
 
 	public void setValidationLevel(ValidationLevel validationLevel) {
 		this.validationLevel = validationLevel;
+	}
+
+	public Date getValidationTime() {
+		return validationTime;
+	}
+
+	public void setValidationTime(Date validationTime) {
+		this.validationTime = validationTime;
+	}
+
+	public int getTimezoneDifference() {
+		return timezoneDifference;
+	}
+
+	public void setTimezoneDifference(int timezoneDifference) {
+		this.timezoneDifference = timezoneDifference;
+	}
+
+	public List<MultipartFile> getEvidenceRecordFiles() {
+		return evidenceRecordFiles;
+	}
+
+	public void setEvidenceRecordFiles(List<MultipartFile> evidenceRecordFiles) {
+		this.evidenceRecordFiles = evidenceRecordFiles;
 	}
 
 	public boolean isDefaultPolicy() {

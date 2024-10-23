@@ -11,21 +11,21 @@ import eu.europa.esig.dss.enumerations.MimeTypeEnum;
 import eu.europa.esig.dss.enumerations.RevocationType;
 import eu.europa.esig.dss.enumerations.TimestampType;
 import eu.europa.esig.dss.enumerations.TokenExtractionStrategy;
+import eu.europa.esig.dss.enumerations.ValidationLevel;
 import eu.europa.esig.dss.model.DSSDocument;
+import eu.europa.esig.dss.model.identifier.OriginalIdentifierProvider;
 import eu.europa.esig.dss.model.identifier.TokenIdentifierProvider;
 import eu.europa.esig.dss.model.x509.CertificateToken;
 import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.spi.policy.SignaturePolicyProvider;
+import eu.europa.esig.dss.spi.validation.CertificateVerifier;
+import eu.europa.esig.dss.spi.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.spi.x509.CertificateSource;
 import eu.europa.esig.dss.spi.x509.CommonCertificateSource;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.CertificateVerifier;
-import eu.europa.esig.dss.validation.CertificateVerifierBuilder;
 import eu.europa.esig.dss.validation.DocumentValidator;
-import eu.europa.esig.dss.validation.OriginalIdentifierProvider;
-import eu.europa.esig.dss.validation.SignaturePolicyProvider;
 import eu.europa.esig.dss.validation.SignedDocumentValidator;
-import eu.europa.esig.dss.validation.UserFriendlyIdentifierProvider;
-import eu.europa.esig.dss.validation.executor.ValidationLevel;
+import eu.europa.esig.dss.validation.identifier.UserFriendlyIdentifierProvider;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.WebAppUtils;
 import eu.europa.esig.dss.web.editor.EnumPropertyEditor;
@@ -62,6 +62,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -75,9 +76,10 @@ public class ValidationController extends AbstractValidationController {
 	private static final String VALIDATION_TILE = "validation";
 	private static final String VALIDATION_RESULT_TILE = "validation-result";
 
-	private static final String[] ALLOWED_FIELDS = { "signedFile", "originalFiles[*].*", "digestToSend", "validationLevel", "defaultPolicy",
-			"policyFile", "signingCertificate", "adjunctCertificates", "includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens",
-			"includeUserFriendlyIdentifiers", "includeSemantics" };
+	private static final String[] ALLOWED_FIELDS = { "signedFile", "originalFiles[*].*", "digestToSend", "validationTime",
+			"validationLevel", "timezoneDifference", "defaultPolicy", "policyFile", "signingCertificate", "adjunctCertificates",
+			"includeCertificateTokens", "includeTimestampTokens", "includeRevocationTokens", "includeUserFriendlyIdentifiers",
+			"includeSemantics" };
 
 	@Autowired
 	private FOPService fopService;
@@ -90,6 +92,7 @@ public class ValidationController extends AbstractValidationController {
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
+		super.initBinder(webDataBinder);
 		webDataBinder.registerCustomEditor(ValidationLevel.class, new EnumPropertyEditor(ValidationLevel.class));
 	}
 
@@ -125,9 +128,12 @@ public class ValidationController extends AbstractValidationController {
 				.fromDocument(WebAppUtils.toDSSDocument(validationForm.getSignedFile()));
 		documentValidator.setCertificateVerifier(getCertificateVerifier(validationForm));
 		documentValidator.setTokenExtractionStrategy(TokenExtractionStrategy.fromParameters(validationForm.isIncludeCertificateTokens(),
-				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens()));
+				validationForm.isIncludeTimestampTokens(), validationForm.isIncludeRevocationTokens(), false));
 		documentValidator.setIncludeSemantics(validationForm.isIncludeSemantics());
 		documentValidator.setSignaturePolicyProvider(signaturePolicyProvider);
+		documentValidator.setValidationLevel(validationForm.getValidationLevel());
+		documentValidator.setValidationTime(getValidationTime(validationForm));
+
 		ValidationService.configureDocumentValidator(documentValidator);
 
 		TokenIdentifierProvider identifierProvider = validationForm.isIncludeUserFriendlyIdentifiers() ?
@@ -149,6 +155,16 @@ public class ValidationController extends AbstractValidationController {
 		setAttributesModels(model, reports);
 
 		return VALIDATION_RESULT_TILE;
+	}
+
+	private Date getValidationTime(ValidationForm validationForm) {
+		if (validationForm.getValidationTime() != null) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(validationForm.getValidationTime());
+			calendar.add(Calendar.MINUTE, validationForm.getTimezoneDifference());
+			return calendar.getTime();
+		}
+		return null;
 	}
 
 	private void setDetachedContents(DocumentValidator documentValidator, ValidationForm validationForm) {
