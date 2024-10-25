@@ -3,8 +3,8 @@ package eu.europa.esig.dss.web.controller;
 import eu.europa.esig.dss.diagnostic.AbstractTokenProxy;
 import eu.europa.esig.dss.diagnostic.CertificateWrapper;
 import eu.europa.esig.dss.diagnostic.DiagnosticData;
+import eu.europa.esig.dss.spi.validation.CertificateVerifier;
 import eu.europa.esig.dss.utils.Utils;
-import eu.europa.esig.dss.validation.CertificateVerifier;
 import eu.europa.esig.dss.validation.reports.AbstractReports;
 import eu.europa.esig.dss.validation.reports.Reports;
 import eu.europa.esig.dss.web.model.TokenDTO;
@@ -14,12 +14,18 @@ import eu.europa.esig.validationreport.jaxb.ValidationReportType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 
 @SessionAttributes({ "simpleReportXml", "detailedReportXml", "diagnosticDataXml", "diagnosticTree" })
 public abstract class AbstractValidationController {
@@ -43,6 +49,14 @@ public abstract class AbstractValidationController {
 
 	@Autowired
 	protected XSLTService xsltService;
+
+	@InitBinder
+	public void initBinder(WebDataBinder webDataBinder) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		dateFormat.setLenient(false);
+		webDataBinder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+	}
 
 	public void setAttributesModels(Model model, AbstractReports reports) {
 		String xmlSimpleReport = reports.getXmlSimpleReport();
