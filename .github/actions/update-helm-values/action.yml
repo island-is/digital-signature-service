@@ -1,0 +1,57 @@
+name: Update helm-values repository
+description: Update helm-values repository with the right image tag for identity-server-services.web
+
+# image tag, array af stageum aka dev, staging, prod
+#
+inputs:
+  ssh-key:
+    description: 'SSH key to use for git operations'
+    required: true
+  app-id:
+    description: 'App ID for GitHub App'
+    required: false
+    default: "405137"
+  files:
+    description: 'Files to update'
+    required: false
+    default: "charts/values.dev.yaml"
+  branch:
+    description: 'Branch to deploy to'
+    required: false
+    default: "main"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get Token
+      id: get-token
+      shell: bash
+      env:
+        APP_ID: ${{ inputs.app-id }}
+        PRIVATE_KEY: ${{ inputs.ssh-key }}
+      run: |
+        node .github/get-github-token.mjs
+    - uses: actions/checkout@v4
+      name: Checkout helm-values repository
+      with:
+        repository: island-is/helm-values
+        token: ${{ steps.get-token.outputs.token }}
+        path: helm-values
+        ref: ${{ inputs.branch }}
+    - name: Copy file
+      shell: bash
+      run: |
+        mkdir -p helm-values/helm-values/dss
+        IFS=',' read -ra FILES <<< "${{ inputs.files }}"
+        for file in "${FILES[@]}"; do
+          filename=$(basename "$file")
+          cp "$file" helm-values/helm-values/dss/"$filename"
+        done
+        cd helm-values
+        git config --global user.email "ci@island.is"
+        git config --global user.name "CI Bot"
+        git add .
+        git commit -m "Updated helm charts"
+        echo "Showing changeset\n $(git show)"
+        git push
+    
