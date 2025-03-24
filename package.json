@@ -3,6 +3,9 @@
   "packageManager": "yarn@4.2.2",
   "dependencies": {
     "@actions/core": "^1.11.1",
-    "@actions/github": "^6.0.0"
+    "@actions/github": "^6.0.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.13.13",
+    "js-yaml": "^4.1.0"
   }
 }

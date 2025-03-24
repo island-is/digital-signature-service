@@ -53,6 +53,12 @@ jobs:
                 tags: "${{ env.DOCKER_REGISTRY }}/dss:${{ github.sha }},${{ env.DOCKER_REGISTRY }}/dss:${{ steps.gettag.outputs.DOCKER_TAG }}"
                 cache-from: type=local,src=/tmp/.buildx-cache
                 cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+            - name: Generate deployment manifest
+              env:
+                DOCKER_TAG: ${{ steps.gettag.outputs.DOCKER_TAG }}
+                PROD_DEPLOY: ${{ steps.gettag.outputs.PROD_DEPLOY }}
+              run: |
+                  node .github/modify-charts.mjs
             - name: Move cache
               run: |
                   rm -rf /tmp/.buildx-cache

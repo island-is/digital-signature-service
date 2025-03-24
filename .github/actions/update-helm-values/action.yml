@@ -1,0 +1,102 @@
+name: Update helm-values repository
+description: Update helm-values repository with the right image tag for identity-server-services.web
+
+# image tag, array af stageum aka dev, staging, prod
+#
+inputs:
+  image_name:
+    description: "Docker image name"
+    default: "identity-server"
+    required: false
+  image_tag:
+    description: "Docker image tag"
+    required: true
+  branch:
+    description: "Branch to push to"
+    default: "main"
+    required: false
+  app-id:
+    description: "App ID for the GitHub App"
+    required: true
+  ssh-key:
+    description: "SSH key so the action can fetch and push to the heml-values repository"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup yarn
+      id: setup-yarn
+      shell: bash
+      run: |
+        (cd ci/ && yarn install)
+    - name: Get stages
+      shell: bash
+      id: get_stages
+      run: |
+        node ./ci/get-stage.mjs
+    - name: Get Token
+      if: ${{ steps.get_stages.outputs.shouldRun == 'true' }}
+      id: get-token
+      shell: bash
+      env:
+        APP_ID: ${{ inputs.app-id }}
+        PRIVATE_KEY: ${{ inputs.ssh-key }}
+      run: |
+        node ./ci/get-github-token.mjs
+    - uses: actions/checkout@v4
+      if: ${{ steps.get_stages.outputs.shouldRun == 'true' }}
+      name: Checkout island.is repository
+      with:
+        repository: island-is/island.is
+        token: ${{ steps.get-token.outputs.token }}
+        ref: main
+        path: island.is
+        sparse-checkout: |
+          charts/identity-server-services
+    - uses: actions/checkout@v4
+      if: ${{ steps.get_stages.outputs.shouldRun == 'true' }}
+      name: Checkout helm-values repository
+      with:
+        repository: island-is/helm-values
+        token: ${{ steps.get-token.outputs.token }}
+        path: helm-values
+        ref: ${{ inputs.branch }}
+    - name: Generate values
+      if: ${{ steps.get_stages.outputs.shouldRun == 'true' }}
+      shell: bash
+      id: generate-values
+      env:
+        IMAGE_TAG: ${{ inputs.image_tag }}
+        IMAGE_NAME: ${{ inputs.image_name }}
+        STAGES: ${{ steps.get_stages.outputs.stages }}
+      run: |
+        node ci/generate-values.mjs
+    - name: Copy affected helm charts from island.is repository to helm-values repository
+      shell: bash
+      if: ${{ steps.get_stages.outputs.shouldRun == 'true' && steps.generate-values.outputs.SHOULD_PUBLISH == 'true' }}
+      env:
+        files: ${{ steps.generate-values.outputs.CHANGED_FILES }}
+      run: |
+        IFS=$IFS,
+        paths=()
+        read -a paths <<< $files
+        for path in ${paths[@]}; do
+          export DEST="helm-values/helm-values/${path#island.is/charts/}"
+          export DEST_PATH=$(dirname $DEST)
+          mkdir -p $DEST_PATH
+          echo "Copying filepath: ${path} to $DEST"
+          cp "$path" "$DEST"
+        done
+    - name: Push changes to helm-value repository
+      shell: bash
+      if: ${{ steps.get_stages.outputs.shouldRun == 'true' && steps.generate-values.outputs.SHOULD_PUBLISH == 'true' }}
+      run: |
+        cd helm-values
+        git config --global user.email "ci@island.is"
+        git config --global user.name "CI Bot"
+
+        git add .
+        git commit -m "Updated helm charts"
+        echo "Showing changeset\n $(git show)"
+        git push

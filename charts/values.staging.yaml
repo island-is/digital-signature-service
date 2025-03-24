@@ -1,0 +1,77 @@
+dss:
+  enabled: true
+  env:
+    JAVA_OPTS: '-Xms1g -Xmx1700m'
+  grantNamespaces:
+    - nginx-ingress-external
+  grantNamespacesEnabled: true
+  healthCheck:
+    liveness:
+      initialDelaySeconds: 60
+      path: /
+      timeoutSeconds: 3
+    readiness:
+      initialDelaySeconds: 3
+      path: /tl-validation-job/tls-available
+      timeoutSeconds: 3
+  hpa:
+    scaling:
+      metric:
+        cpuAverageUtilization: 70
+        nginxRequestsIrate: 2
+      replicas:
+        max: 3
+        min: 2
+  image:
+    repository: 821090935708.dkr.ecr.eu-west-1.amazonaws.com/dss
+  ingress:
+    primary-alb:
+      annotations:
+        kubernetes.io/ingress.class: nginx-external-alb
+        nginx.ingress.kubernetes.io/affinity: cookie
+        nginx.ingress.kubernetes.io/affinity-mode: persistent
+        nginx.ingress.kubernetes.io/enable-global-auth: 'false'
+        nginx.ingress.kubernetes.io/proxy-body-size: 50m
+      hosts:
+        - host: dss.staging01.devland.is
+          paths:
+            - /
+  namespace: dss
+  podSecurityContext:
+    fsGroup: 65534
+  replicaCount:
+    default: 2
+    max: 3
+    min: 2
+  resources:
+    limits:
+      cpu: 2400m
+      memory: 2.5Gi
+    requests:
+      cpu: 1200m
+      memory: 1.25Gi
+  secrets:
+    CONFIGCAT_SDK_KEY: /k8s/configcat/CONFIGCAT_SDK_KEY
+  securityContext:
+    allowPrivilegeEscalation: false
+    privileged: false
+  service:
+    targetPort: 8080
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::261174024191:role/dss
+    create: true
+    name: dss
+global:
+  env:
+    AUDIT_GROUP_NAME: /island-is/audit-log
+    AWS_REGION: eu-west-1
+    IDENTITY_SERVER_ISSUER_URL: https://identity-server.staging01.devland.is
+    PORT: '3333'
+    name: staging
+  image:
+    tag: latest_master
+  initContainer:
+    env:
+      AWS_REGION: eu-west-1
+

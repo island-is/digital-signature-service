@@ -20,10 +20,9 @@ const deployToProd = branch === 'main';
 console.log(`Branch is ${branch}`);
 console.log(`Tag is: ${tag}`);
 console.log(deployToProd ? 'Deploying to release branch' : 'Not deploying to release branch');
+
 core.setOutput('DOCKER_TAG', tag);
-core.exportVariable('DOCKER_TAG', tag);
 core.setOutput('PROD_DEPLOY', JSON.stringify(deployToProd));
-core.exportVariable('PROD_DEPLOY', JSON.stringify(deployToProd));
 
 function createRandomString(length) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
