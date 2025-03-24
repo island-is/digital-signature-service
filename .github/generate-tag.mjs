@@ -12,7 +12,7 @@ const shortBranch = (() => {
         return branch
     }
     return branch.substring(0, 10)
-})
+})();
 
 const tag = `${shortBranch}-${sha}-${randomTag}`;
 const deployToProd = branch === 'main';
