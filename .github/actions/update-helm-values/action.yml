@@ -50,7 +50,6 @@ runs:
           cp "$file" helm-values/helm-values/dss/"$filename"
         done
     - name: Push changes to helm-value repository
-      if: ${{ steps.get_stages.outputs.shouldRun == 'true' && steps.generate-values.outputs.SHOULD_PUBLISH == 'true' }}
       shell: bash
       run: |
         cd helm-values
