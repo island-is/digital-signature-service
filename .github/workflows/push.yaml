@@ -3,7 +3,6 @@ on:
     push:
       branches:
         - main
-        - push-to-helmvalues
     pull_request:
       branches:
         - main
@@ -46,5 +45,15 @@ jobs:
                 key: ${{ runner.os }}-buildx-cache-v2-${{ github.sha }}
                 restore-keys: |
                   ${{ runner.os }}-buildx-cache-v2
-      
-            
+            - name: Build and push
+              uses: docker/build-push-action@v6
+              with:
+                context: .
+                push: true
+                tags: "${{ env.DOCKER_REGISTRY }}/dss:${{ github.sha }},${{ env.DOCKER_REGISTRY }}/dss:${{ steps.gettag.outputs.DOCKER_TAG }}"
+                cache-from: type=local,src=/tmp/.buildx-cache
+                cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+            - name: Move cache
+              run: |
+                  rm -rf /tmp/.buildx-cache
+                  mv /tmp/.buildx-cache-new /tmp/.buildx-cache
