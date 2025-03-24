@@ -24,7 +24,6 @@ runs:
   using: "composite"
   steps:
     - name: Get Token
-      if: ${{ steps.get_stages.outputs.shouldRun == 'true' }}
       id: get-token
       shell: bash
       env:
@@ -33,7 +32,6 @@ runs:
       run: |
         node ./ci/get-github-token.mjs
     - uses: actions/checkout@v4
-      if: ${{ steps.get_stages.outputs.shouldRun == 'true' }}
       name: Checkout helm-values repository
       with:
         repository: island-is/helm-values
@@ -43,12 +41,6 @@ runs:
     - name: Copy file
       shell: bash
       run: |
-        ls
-        cd helm-values
-        git checkout ${{ inputs.branch}} && git pull
-        git config --global user.email "ci@island.is"
-        git config --global user.name "CI Bot"
-        cd ..
         mkdir -p helm-values/helm-values/dss
         IFS=',' read -ra FILES <<< "${{ inputs.files }}"
         for file in "${FILES[@]}"; do
@@ -56,6 +48,8 @@ runs:
           cp "$file" helm-values/helm-values/dss/"$filename"
         done
         cd helm-values
+        git config --global user.email "ci@island.is"
+        git config --global user.name "CI Bot"
         git add .
         git commit -m "Updated helm charts"
         echo "Showing changeset\n $(git show)"
