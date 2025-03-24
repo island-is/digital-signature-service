@@ -30,7 +30,7 @@ runs:
         APP_ID: ${{ inputs.app-id }}
         PRIVATE_KEY: ${{ inputs.ssh-key }}
       run: |
-        node ./ci/get-github-token.mjs
+        node .github/get-github-token.mjs
     - uses: actions/checkout@v4
       name: Checkout helm-values repository
       with:
