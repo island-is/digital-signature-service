@@ -43,6 +43,7 @@ runs:
     - name: Copy file
       shell: bash
       run: |
+        ls
         cd helm-values
         git checkout ${{ inputs.branch}} && git pull
         git config --global user.email "ci@island.is"
