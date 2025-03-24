@@ -43,20 +43,20 @@ runs:
     - name: Copy file
       shell: bash
       run: |
+        cd helm-values
+        git checkout ${{ inputs.branch}} && git pull
+        git config --global user.email "ci@island.is"
+        git config --global user.name "CI Bot"
+        cd ..
         mkdir -p helm-values/helm-values/dss
         IFS=',' read -ra FILES <<< "${{ inputs.files }}"
         for file in "${FILES[@]}"; do
           filename=$(basename "$file")
           cp "$file" helm-values/helm-values/dss/"$filename"
         done
-    - name: Push changes to helm-value repository
-      shell: bash
-      run: |
         cd helm-values
-        git config --global user.email "ci@island.is"
-        git config --global user.name "CI Bot"
-
         git add .
         git commit -m "Updated helm charts"
         echo "Showing changeset\n $(git show)"
         git push
+    
