@@ -24,8 +24,9 @@ async function processFile(stage) {
     const yamlContent = await jsyaml.load(textContent);
     // Ignore type checking
     // @ts-ignore
-    yamlContent.image.tag = tag;
-    writeFileSync(chartFiles[stage], jsyaml.dump(yamlContent));
+    yamlContent.dss.image.tag = tag;
+    // @ts-ignore
+    writeFileSync(chartFiles[stage], jsyaml.dump(yamlContent.dss));
     console.log(`Updated ${chartFiles[stage]} with tag ${tag}`);
     return yamlContent;    
 }
