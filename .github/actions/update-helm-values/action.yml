@@ -47,7 +47,7 @@ runs:
         IFS=',' read -ra FILES <<< "${{ inputs.files }}"
         for file in "${FILES[@]}"; do
           filename=$(basename "$file")
-          cp "$file" helm-values/helm-values/dss/"$file"
+          cp "$file" helm-values/helm-values/dss/"$filename"
         done
     - name: Push changes to helm-value repository
       if: ${{ steps.get_stages.outputs.shouldRun == 'true' && steps.generate-values.outputs.SHOULD_PUBLISH == 'true' }}
