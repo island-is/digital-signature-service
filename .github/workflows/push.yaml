@@ -59,6 +59,19 @@ jobs:
                 PROD_DEPLOY: ${{ steps.gettag.outputs.PROD_DEPLOY }}
               run: |
                   node .github/modify-charts.mjs
+            - name: Upload dev manifest
+              uses: ./.github/actions/update-helm-values
+              with:
+                    ssh-key: ${{ secrets.SSH_KEY }}
+                    files: "charts/values.dev.yaml"
+                    branch: main
+            - name: Upload prod manifest
+              if: ${{ steps.gettag.outputs.PROD_DEPLOY == 'true' }}
+              uses: ./.github/actions/update-helm-values
+              with:
+                ssh-key: ${{ secrets.SSH_KEY }}
+                files: "charts/values.prod.yaml,charts/values.staging.yaml"
+                branch: release
             - name: Move cache
               run: |
                   rm -rf /tmp/.buildx-cache

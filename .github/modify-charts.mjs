@@ -28,5 +28,6 @@ async function processFile(stage) {
     // @ts-ignore
     writeFileSync(chartFiles[stage], jsyaml.dump(yamlContent.dss));
     console.log(`Updated ${chartFiles[stage]} with tag ${tag}`);
+    
     return yamlContent;    
 }
