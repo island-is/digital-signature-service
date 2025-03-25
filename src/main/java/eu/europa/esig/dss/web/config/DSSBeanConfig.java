@@ -27,6 +27,7 @@ import eu.europa.esig.dss.spi.x509.aia.DefaultAIASource;
 import eu.europa.esig.dss.spi.x509.revocation.crl.CRLSource;
 import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPSource;
 import eu.europa.esig.dss.tsl.alerts.TLAlert;
+import eu.europa.esig.dss.tsl.function.GrantedOrRecognizedAtNationalLevelTrustAnchorPeriodPredicate;
 import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.tsl.source.LOTLSource;
@@ -85,6 +86,9 @@ public class DSSBeanConfig {
 
 	@Value("${tl.loader.trust.all}")
 	private boolean tlTrustAllStrategy;
+
+    @Value("${tl.loader.lotl.use.sunset.date}")
+    private boolean useSunsetDate;
 
 	@Value("${tl.loader.cache.folder:}")
 	private String tlCacheFolder;
@@ -344,6 +348,9 @@ public class DSSBeanConfig {
 		lotlSource.setCertificateSource(ojContentKeyStore());
 		lotlSource.setSigningCertificatesAnnouncementPredicate(new OfficialJournalSchemeInformationURI(currentOjUrl));
 		lotlSource.setPivotSupport(true);
+        if (useSunsetDate) {
+            lotlSource.setTrustAnchorValidityPredicate(new GrantedOrRecognizedAtNationalLevelTrustAnchorPeriodPredicate());
+        }
 		return lotlSource;
 	}
 
