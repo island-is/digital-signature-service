@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.job", "eu.europa.esig.dss.web.service" })
@@ -89,6 +90,9 @@ public class DSSBeanConfig {
 
     @Value("${tl.loader.lotl.use.sunset.date}")
     private boolean useSunsetDate;
+
+    @Value("${tl.loader.lotl.tl.versions}")
+    private List<Integer> lotlTLVersions;
 
 	@Value("${tl.loader.cache.folder:}")
 	private String tlCacheFolder;
@@ -350,6 +354,9 @@ public class DSSBeanConfig {
 		lotlSource.setPivotSupport(true);
         if (useSunsetDate) {
             lotlSource.setTrustAnchorValidityPredicate(new GrantedOrRecognizedAtNationalLevelTrustAnchorPeriodPredicate());
+        }
+        if (Utils.isCollectionNotEmpty(lotlTLVersions)) {
+            lotlSource.setTLVersions(lotlTLVersions);
         }
 		return lotlSource;
 	}
