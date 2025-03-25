@@ -16,10 +16,7 @@
         <PolicyAvailable Level="INFORM" />
         <PolicyHashMatch Level="WARN" />
         <AcceptableFormats Level="FAIL">
-            <Id>XAdES-BASELINE-LT</Id>
-            <Id>XAdES-BASELINE-LTA</Id>
-            <Id>PAdES-BASELINE-LT</Id>
-            <Id>PAdES-BASELINE-LTA</Id>
+            <Id>*</Id>
         </AcceptableFormats>
         <BasicSignatureConstraints>
             <ReferenceDataExistence Level="FAIL" />
