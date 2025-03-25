@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @ImportResource({ "classpath:META-INF/cxf/cxf.xml" })
@@ -100,7 +101,7 @@ public class CXFConfig {
 		sfb.setAddress(REST_VALIDATION);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
-		sfb.setFeatures(Collections.singletonList(createOpenApiFeature()));
+        sfb.setFeatures(createFeatures(RestDocumentValidationService.class.getName()));
 		return sfb.create();
 	}
 
@@ -111,12 +112,15 @@ public class CXFConfig {
 		sfb.setAddress(REST_CERTIFICATE_VALIDATION);
 		sfb.setProvider(jacksonJsonProvider());
 		sfb.setProvider(exceptionRestMapper());
-		sfb.setFeatures(Collections.singletonList(createOpenApiFeature()));
+        sfb.setFeatures(createFeatures(RestCertificateValidationService.class.getName()));
 		return sfb.create();
 	}
-	
-    @Bean
-    public OpenApiFeature createOpenApiFeature() {
+
+    private List<OpenApiFeature> createFeatures(String resourcesClassName) {
+        return Collections.singletonList(createOpenApiFeature(resourcesClassName));
+    }
+
+    private OpenApiFeature createOpenApiFeature(String resourcesClassName) {
         final OpenApiFeature openApiFeature = new OpenApiFeature();
 		openApiFeature.setCustomizer(openApiCustomizer());
         openApiFeature.setPrettyPrint(true);
@@ -124,11 +128,11 @@ public class CXFConfig {
 		openApiFeature.setUseContextBasedConfig(true);
         openApiFeature.setTitle("DSS WebServices");
 		openApiFeature.setVersion(dssVersion);
+        openApiFeature.setResourceClasses(Collections.singleton(resourcesClassName));
         return openApiFeature;
     }
 
-	@Bean
-	public OpenApiCustomizer openApiCustomizer() {
+    private OpenApiCustomizer openApiCustomizer() {
 		OpenApiCustomizer customizer = new OpenApiCustomizer();
 		customizer.setDynamicBasePath(true);
 		return customizer;
