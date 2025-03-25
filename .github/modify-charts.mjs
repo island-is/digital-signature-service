@@ -26,7 +26,18 @@ async function processFile(stage) {
     // @ts-ignore
     yamlContent.dss.image.tag = tag;
     // @ts-ignore
-    writeFileSync(chartFiles[stage], jsyaml.dump(yamlContent.dss));
+    const dssObj = JSON.parse(JSON.stringify(yamlContent.dss));
+    // @ts-ignore
+    const globalObj = JSON.parse(JSON.stringify(yamlContent.global));
+    if ('image' in globalObj) {
+        delete globalObj['image'];
+    }
+    const newObj = {
+        ...dssObj,
+        global: globalObj
+    }
+    // @ts-ignore
+    writeFileSync(chartFiles[stage], jsyaml.dump(newObj));
     console.log(`Updated ${chartFiles[stage]} with tag ${tag}`);
     
     return yamlContent;    
