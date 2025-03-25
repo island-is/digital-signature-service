@@ -29,7 +29,9 @@ async function processFile(stage) {
     const dssObj = JSON.parse(JSON.stringify(yamlContent.dss));
     // @ts-ignore
     const globalObj = JSON.parse(JSON.stringify(yamlContent.global));
-    delete globalObj['image'];
+    if ('image' in globalObj) {
+        delete globalObj['image'];
+    }
     const newObj = {
         ...dssObj,
         global: globalObj
