@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.4</version>
+		<version>3.4.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>6.1</version>
+	<version>6.2</version>
 	<packaging>jar</packaging>
 
 	<name>Digital Island - Digital Signature Services</name>
@@ -50,17 +50,17 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.version>6.1</dss.version>
+		<dss.version>6.2</dss.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
-		<logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
-		<cxf.version>4.0.5</cxf.version>
-		<jackson-jakarta-rs-json-provider.version>2.17.2</jackson-jakarta-rs-json-provider.version>
-		<commons-io.version>2.16.1</commons-io.version>
-		<hikaricp.version>5.1.0</hikaricp.version>
-		<freemarker.version>2.3.33</freemarker.version>
-		<hsqldb.version>2.7.3</hsqldb.version>
-		<fop-core.version>2.9</fop-core.version>
+		<logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
+		<cxf.version>4.1.1</cxf.version>
+		<jackson-jakarta-rs-json-provider.version>2.18.3</jackson-jakarta-rs-json-provider.version>
+		<commons-io.version>2.18.0</commons-io.version>
+		<hikaricp.version>6.2.1</hikaricp.version>
+		<freemarker.version>2.3.34</freemarker.version>
+		<hsqldb.version>2.7.4</hsqldb.version>
+		<fop-core.version>2.10</fop-core.version>
 		<nexu.version>1.22</nexu.version>
 	</properties>
 
@@ -137,7 +137,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.13.0</version>
+					<version>3.14.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -147,7 +147,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
-					<version>3.1.3</version>
+					<version>3.1.4</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -173,7 +173,7 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-shade-plugin</artifactId>
+                    <artifactId>maven-shade-plugin</artifactId>
 					<version>3.6.0</version>
 				</plugin>
 				<plugin>
@@ -203,7 +203,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.5.0</version>
+					<version>3.5.2</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -243,7 +243,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.6.0</version>
+			<version>2.8.6</version>
 		</dependency>
 
 		<!-- DSS Core dependencies -->
@@ -493,7 +493,7 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>highlightjs</artifactId>
-			<version>11.5.0</version>
+			<version>11.11.1</version>
 		</dependency>
 
 		<dependency>
@@ -546,7 +546,7 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>10.0.4</version>
+						<version>12.1.0</version>
 						<executions>
 							<execution>
 								<goals>
@@ -572,7 +572,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
-						<version>3.5.0</version>
+						<version>3.5.2</version>
 						<executions>
 							<execution>
 								<goals>
