@@ -1,5 +1,6 @@
 dss:
   enabled: true
+  name: dss
   env:
     JAVA_OPTS: '-Xms1g -Xmx1700m'
   grantNamespaces:
