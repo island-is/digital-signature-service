@@ -1,6 +1,8 @@
 // @ts-check
 
 import { readFileSync, writeFileSync } from "node:fs";
+import { context } from '@actions/github';
+import core from '@actions/core';
 import jsyaml from 'js-yaml'
 
 const chartFiles = {
@@ -18,6 +20,7 @@ if (shouldDeployToProd) {
     await processFile('prod');
     await processFile('staging');
 }
+core.setOutput('COMMIT_MESSAGE', getCommitMsg());
 
 async function processFile(stage) {
     const textContent = readFileSync(chartFiles[stage], 'utf8');
@@ -41,4 +44,8 @@ async function processFile(stage) {
     console.log(`Updated ${chartFiles[stage]} with tag ${tag}`);
     
     return yamlContent;    
-}
+1}
+
+function getCommitMsg() {
+    return `Change from: https://github.com/island-is/digital-signature-service/commit/${context.sha}`;
+  }
