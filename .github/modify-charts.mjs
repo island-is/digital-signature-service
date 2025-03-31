@@ -44,8 +44,7 @@ async function processFile(stage) {
     console.log(`Updated ${chartFiles[stage]} with tag ${tag}`);
     
     return yamlContent;    
-1}
-
+}
 function getCommitMsg() {
     return `Change from: https://github.com/island-is/digital-signature-service/commit/${context.sha}`;
   }
