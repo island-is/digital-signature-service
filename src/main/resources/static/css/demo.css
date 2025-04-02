@@ -223,6 +223,16 @@ pre.prettyprint {
 
 /* End Validation reports */
 
+/* Extra large devices */
+
+@media (min-width: 1400px) {
+    .container, .container-lg, .container-md, .container-sm, .container-xl {
+        max-width: 1320px;
+    }
+}
+
+/* End Extra large devices */
+
 /* Mobile devices */
 
 /* Extra small devices (portrait phones, less than 576px) */
