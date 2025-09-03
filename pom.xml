@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.4</version>
+		<version>3.5.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -472,6 +472,14 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+
+        <!-- Temporary bump while spring-boot 3.5.x uses a commons-lang3 version 3.17.0 with a vulnerability -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.18.0</version>
+        </dependency>
 
 		<!-- logback -->
 		<dependency>
