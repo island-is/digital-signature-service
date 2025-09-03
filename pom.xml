@@ -12,7 +12,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>6.2</version>
+	<version>6.3</version>
 	<packaging>jar</packaging>
 
 	<name>Digital Island - Digital Signature Services</name>
@@ -50,7 +50,7 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.version>6.2</dss.version>
+		<dss.version>6.3</dss.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
@@ -307,7 +307,17 @@
 			<version>${dss.version}</version>
 		</dependency>
 
-		<!-- Choose your PAdES implementation -->
+        <!-- Choose your CMS implementation -->
+        <dependency>
+            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+            <artifactId>dss-cms-object</artifactId>
+        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>eu.europa.ec.joinup.sd-dss</groupId>-->
+        <!--            <artifactId>dss-cms-stream</artifactId>-->
+        <!--        </dependency>-->
+
+        <!-- Choose your PAdES implementation -->
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>dss-pades-pdfbox</artifactId>
