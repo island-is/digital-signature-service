@@ -1,5 +1,5 @@
 # First stage: build the application with maven
-FROM maven:3.9.9-eclipse-temurin-21 AS build
+FROM maven:3.9.11-eclipse-temurin-21 AS build
 
 COPY . /home/island-is/app
 WORKDIR /home/island-is/app
