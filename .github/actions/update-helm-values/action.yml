@@ -19,6 +19,10 @@ inputs:
     description: 'Branch to deploy to'
     required: false
     default: "main"
+  message:
+    description: 'Commit message'
+    required: false
+    default: "Updated helm charts"
 
 runs:
   using: "composite"
@@ -51,7 +55,7 @@ runs:
         git config --global user.email "ci@island.is"
         git config --global user.name "CI Bot"
         git add .
-        git commit -m "Updated helm charts"
+        git commit -m "${{ inputs.message }}"
         echo "Showing changeset\n $(git show)"
         git push
     
