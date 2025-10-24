@@ -48,8 +48,8 @@ dss:
       cpu: 2400m
       memory: 2.5Gi
     requests:
-      cpu: 1200m
-      memory: 1.25Gi
+      cpu: 2400m
+      memory: 2.5Gi
   secrets:
     CONFIGCAT_SDK_KEY: /k8s/configcat/CONFIGCAT_SDK_KEY
   securityContext:
