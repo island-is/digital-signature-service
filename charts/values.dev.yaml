@@ -63,8 +63,6 @@ dss:
       eks.amazonaws.com/role-arn: arn:aws:iam::013313053092:role/dss
     create: true
     name: dss
-  strategy:
-    type: Recreate
 global:
   env:
     AUDIT_GROUP_NAME: /island-is/audit-log
