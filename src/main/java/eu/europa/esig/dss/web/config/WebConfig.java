@@ -19,11 +19,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ComponentScan(basePackages = { "eu.europa.esig.dss.web.controller" })
 public class WebConfig implements WebMvcConfigurer {
 
-	@Value("${multipart.maxFileSize}")
-	private long maxFileSize;
+    @Value("${multipart.maxFileSize:-1}")
+    private long maxFileSize;
 
-	@Value("${multipart.maxInMemorySize}")
-	private int maxInMemorySize;
+    @Value("${multipart.maxInMemorySize:-1}")
+    private long maxInMemorySize;
 
 	@Value("${multipart.resolveLazily:false}")
 	private boolean resolveLazily;
