@@ -68,13 +68,18 @@ public final class WebAppUtils {
 	public static List<DSSDocument> originalFilesToDSSDocuments(List<OriginalFile> originalFiles) {
 		List<DSSDocument> dssDocuments = new ArrayList<>();
 		if (Utils.isCollectionNotEmpty(originalFiles)) {
+            long inMemorySize = 0;
 			for (OriginalFile originalDocument : originalFiles) {
 				if (originalDocument.isNotEmpty()) {
 					DSSDocument dssDocument;
                     MultipartFile completeFile = originalDocument.getCompleteFile();
 					if (completeFile != null) {
                         dssDocument = toDSSDocument(completeFile);
-					} else {
+                        inMemorySize += completeFile.getSize();
+                        if (inMemorySize > MultipartResolverProvider.getInstance().getMaxInMemorySize()) {
+                            throw new MaxUploadSizeExceededException(MultipartResolverProvider.getInstance().getMaxInMemorySize());
+                        }
+                    } else {
 						dssDocument = new DigestDocument(originalDocument.getDigestAlgorithm(),
 								originalDocument.getBase64Digest(), originalDocument.getFilename());
 					}
