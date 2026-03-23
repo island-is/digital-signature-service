@@ -37,6 +37,9 @@ dss:
           paths:
             - /
   namespace: dss
+  podDisruptionBudget:
+    minAvailable: "50%"
+    unhealthyPodEvictionPolicy: IfHealthyBudget
   podSecurityContext:
     fsGroup: 65534
   replicaCount:
