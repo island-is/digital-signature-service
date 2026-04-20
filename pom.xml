@@ -12,7 +12,7 @@
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>6.3</version>
+	<version>6.4</version>
 	<packaging>jar</packaging>
 
 	<name>Digital Island - Digital Signature Services</name>
@@ -50,7 +50,7 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.version>6.3</dss.version>
+		<dss.version>6.4</dss.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
