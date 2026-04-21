@@ -5,6 +5,7 @@ dss:
     JAVA_OPTS: '-Xms1g -Xmx1700m'
   grantNamespaces:
     - nginx-ingress-external
+    - envoy-gateway-external
   grantNamespacesEnabled: true
   healthCheck:
     liveness:
@@ -37,6 +38,17 @@ dss:
           paths:
             - /
   namespace: dss
+  httpRoute:
+    primary-gw:
+      annotations: {}
+      parentRefs:
+        - name: gateway-external
+          namespace: envoy-gateway-external
+      hostnames:
+        - dss.island.is
+      rules:
+        - matches:
+            - pathPrefix: /
   podDisruptionBudget:
     minAvailable: "50%"
     unhealthyPodEvictionPolicy: IfHealthyBudget
