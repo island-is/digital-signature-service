@@ -19,8 +19,8 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class RestDocumentValidationIT extends AbstractRestIT {
 
 		factory.setAddress(getBaseCxf() + CXFConfig.REST_VALIDATION);
 		factory.setServiceClass(RestDocumentValidationService.class);
-		factory.setProviders(Arrays.asList(jacksonJsonProvider()));
+		factory.setProviders(Collections.singletonList(jacksonJsonProvider()));
 
 		LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
 		factory.getInInterceptors().add(loggingInInterceptor);

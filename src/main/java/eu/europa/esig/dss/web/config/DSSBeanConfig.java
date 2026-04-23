@@ -6,12 +6,15 @@ import eu.europa.esig.dss.alert.handler.AlertHandler;
 import eu.europa.esig.dss.enumerations.Indication;
 import eu.europa.esig.dss.model.DSSException;
 import eu.europa.esig.dss.model.tsl.TLInfo;
+import eu.europa.esig.dss.service.SecureRandomNonceSource;
+import eu.europa.esig.dss.service.crl.FileCacheCRLSource;
 import eu.europa.esig.dss.service.crl.JdbcCacheCRLSource;
 import eu.europa.esig.dss.service.crl.OnlineCRLSource;
 import eu.europa.esig.dss.service.http.commons.CommonsDataLoader;
 import eu.europa.esig.dss.service.http.commons.FileCacheDataLoader;
 import eu.europa.esig.dss.service.http.commons.OCSPDataLoader;
 import eu.europa.esig.dss.service.http.proxy.ProxyConfig;
+import eu.europa.esig.dss.service.ocsp.FileCacheOCSPSource;
 import eu.europa.esig.dss.service.ocsp.JdbcCacheOCSPSource;
 import eu.europa.esig.dss.service.ocsp.OnlineOCSPSource;
 import eu.europa.esig.dss.service.x509.aia.JdbcCacheAIASource;
@@ -139,7 +142,13 @@ public class DSSBeanConfig {
 	@Value("${dataloader.use.system.properties}")
 	private boolean useSystemProperties;
 
-	@Value("${is.country.code}")
+    @Value("${dataloader.ocsp.nonce.enabled}")
+    private boolean ocspNonceEnabled;
+
+    @Value("${dataloader.ocsp.nonce.size:32}")
+    private int ocspNonceSize;
+
+    @Value("${is.country.code}")
 	private String icelandCountryCode;
 
 	@Value("${is.distribution.point}")
@@ -211,17 +220,19 @@ public class DSSBeanConfig {
 			jdbcCacheCRLSource.setMaxNextUpdateDelay(crlMaxNextUpdate);
 			return jdbcCacheCRLSource;
 		}
-		OnlineCRLSource onlineCRLSource = onlineCRLSource();
-		FileCacheDataLoader fileCacheDataLoader = initFileCacheDataLoader();
-		fileCacheDataLoader.setCacheExpirationTime(crlMaxNextUpdate * 1000); // to millis
-		onlineCRLSource.setDataLoader(fileCacheDataLoader);
-		return onlineCRLSource;
+        FileCacheCRLSource fileCacheCRLSource = new FileCacheCRLSource(onlineCRLSource());
+        fileCacheCRLSource.setDefaultNextUpdateDelay(crlDefaultNextUpdate);
+        fileCacheCRLSource.setMaxNextUpdateDelay(crlMaxNextUpdate);
+        return fileCacheCRLSource;
 	}
 
 	@Bean
 	public OnlineOCSPSource onlineOCSPSource() {
 		OnlineOCSPSource onlineOCSPSource = new OnlineOCSPSource();
 		onlineOCSPSource.setDataLoader(ocspDataLoader());
+        if (ocspNonceEnabled) {
+            onlineOCSPSource.setNonceSource(new SecureRandomNonceSource(ocspNonceSize));
+        }
 		return onlineOCSPSource;
 	}
 
@@ -233,12 +244,10 @@ public class DSSBeanConfig {
 			jdbcCacheOCSPSource.setMaxNextUpdateDelay(ocspMaxNextUpdate);
 			return jdbcCacheOCSPSource;
 		}
-		OnlineOCSPSource onlineOCSPSource = onlineOCSPSource();
-		FileCacheDataLoader fileCacheDataLoader = initFileCacheDataLoader();
-		fileCacheDataLoader.setDataLoader(ocspDataLoader());
-		fileCacheDataLoader.setCacheExpirationTime(ocspMaxNextUpdate * 1000); // to millis
-		onlineOCSPSource.setDataLoader(fileCacheDataLoader);
-		return onlineOCSPSource;
+        FileCacheOCSPSource fileCacheOCSPSource = new FileCacheOCSPSource(onlineOCSPSource());
+        fileCacheOCSPSource.setDefaultNextUpdateDelay(ocspDefaultNextUpdate);
+        fileCacheOCSPSource.setMaxNextUpdateDelay(ocspMaxNextUpdate);
+        return fileCacheOCSPSource;
 	}
 
 	@Bean

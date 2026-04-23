@@ -1,17 +1,24 @@
 package eu.europa.esig.dss.web.job;
 
+import eu.europa.esig.dss.spi.DSSSecurityProvider;
 import eu.europa.esig.dss.tsl.job.TLValidationJob;
 import eu.europa.esig.dss.utils.Utils;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TSLLoaderJob {
 
-	@Value("${cron.tl.loader.enable}")
+    private static final Logger LOG = LoggerFactory.getLogger(TSLLoaderJob.class);
+
+    @Value("${cron.tl.loader.enable}")
 	private boolean enable;
 
 	@Value("${bc.rsa.max_mr_tests:}")
@@ -20,7 +27,13 @@ public class TSLLoaderJob {
 	@Value("${xmlsec.manifest.max.references:}")
 	private String xmlsecManifestMaxRefsCount;
 
-	@Autowired
+    @Value("${security.provider:}")
+    private String securityProvider;
+
+    @Value("${alternative.security.providers:}")
+    private List<String> alternativeSecurityProviders;
+
+    @Autowired
 	private TLValidationJob job;
 
 	@PostConstruct
@@ -31,6 +44,14 @@ public class TSLLoaderJob {
 		if (Utils.isStringNotEmpty(xmlsecManifestMaxRefsCount)) {
 			System.setProperty("org.apache.xml.security.maxReferences", xmlsecManifestMaxRefsCount);
 		}
+        if (Utils.isStringNotEmpty(securityProvider)) {
+            LOG.info("Security provider set : {}", securityProvider);
+            DSSSecurityProvider.setSecurityProvider(securityProvider);
+        }
+        if (Utils.isCollectionNotEmpty(alternativeSecurityProviders)) {
+            LOG.info("Alternative security providers added : {}", alternativeSecurityProviders);
+            DSSSecurityProvider.setAlternativeSecurityProviders(alternativeSecurityProviders.toArray(new String[0]));
+        }
 		job.offlineRefresh();
 	}
 

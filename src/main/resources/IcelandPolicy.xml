@@ -58,6 +58,7 @@
 				</KeyUsage>
 				<PolicyTree Level="FAIL" />
 				<NameConstraints Level="FAIL" />
+                <AuthorityKeyIdentifierPresent Level="WARN" />
                 <NoRevAvail Level="INFORM" />
 				<SupportedCriticalExtensions Level="FAIL">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
@@ -168,6 +169,8 @@
 				</KeyUsage>
 				<PolicyTree Level="FAIL" />
 				<NameConstraints Level="FAIL" />
+                <AuthorityKeyIdentifierPresent Level="WARN" />
+                <SubjectKeyIdentifierPresent Level="FAIL" />
 				<SupportedCriticalExtensions Level="FAIL">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
 					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
@@ -271,6 +274,7 @@
 			<IssuerSerialMatch Level="FAIL" />
 			<KeyIdentifierMatch Level="FAIL" />
 			<SigningTime Level="FAIL" />
+            <SigningTimeInCertRange Level="FAIL" />
 			<MessageDigestOrSignedPropertiesPresent Level="FAIL" />
 			<EllipticCurveKeySize Level="FAIL" />
 		</SignedAttributes>
@@ -309,6 +313,7 @@
 				</KeyUsage>
 				<PolicyTree Level="FAIL" />
 				<NameConstraints Level="FAIL" />
+                <AuthorityKeyIdentifierPresent Level="WARN" />
                 <NoRevAvail Level="INFORM" />
 				<SupportedCriticalExtensions Level="FAIL">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
@@ -348,6 +353,8 @@
 				</KeyUsage>
 				<PolicyTree Level="FAIL" />
 				<NameConstraints Level="FAIL" />
+                <AuthorityKeyIdentifierPresent Level="WARN" />
+                <SubjectKeyIdentifierPresent Level="FAIL" />
 				<SupportedCriticalExtensions Level="FAIL">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
 					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
@@ -381,6 +388,7 @@
 			<IssuerSerialMatch Level="FAIL" />
 			<KeyIdentifierMatch Level="FAIL" />
 			<SigningTime Level="FAIL" />
+            <SigningTimeInCertRange Level="FAIL" />
 			<MessageDigestOrSignedPropertiesPresent Level="FAIL" />
 			<EllipticCurveKeySize Level="FAIL" />
 		</SignedAttributes>
@@ -427,6 +435,7 @@
 				</ExtendedKeyUsage>
 				<PolicyTree Level="FAIL" />
 				<NameConstraints Level="FAIL" />
+                <AuthorityKeyIdentifierPresent Level="WARN" />
 				<SupportedCriticalExtensions Level="FAIL">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
 					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
@@ -463,6 +472,8 @@
 				</KeyUsage>
 				<PolicyTree Level="FAIL" />
 				<NameConstraints Level="FAIL" />
+                <AuthorityKeyIdentifierPresent Level="WARN" />
+                <SubjectKeyIdentifierPresent Level="FAIL" />
 				<SupportedCriticalExtensions Level="FAIL">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
 					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
@@ -525,6 +536,7 @@
 				<RevocationFreshness Level="IGNORE" Unit="HOURS" Value="24" />
 				<PolicyTree Level="FAIL" />
 				<NameConstraints Level="FAIL" />
+                <AuthorityKeyIdentifierPresent Level="WARN" />
 				<SupportedCriticalExtensions Level="FAIL">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
 					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
@@ -559,6 +571,8 @@
 				</KeyUsage>
 				<PolicyTree Level="FAIL" />
 				<NameConstraints Level="FAIL" />
+                <AuthorityKeyIdentifierPresent Level="WARN" />
+                <SubjectKeyIdentifierPresent Level="FAIL" />
 				<SupportedCriticalExtensions Level="FAIL">
 					<Id>2.5.29.15</Id> <!-- keyUsage -->
 					<Id>2.5.29.32</Id> <!-- certificatePolicies -->
