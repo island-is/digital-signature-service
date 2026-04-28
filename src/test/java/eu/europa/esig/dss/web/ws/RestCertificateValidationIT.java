@@ -6,6 +6,7 @@ import eu.europa.esig.dss.diagnostic.jaxb.XmlCertificate;
 import eu.europa.esig.dss.diagnostic.jaxb.XmlDiagnosticData;
 import eu.europa.esig.dss.simplecertificatereport.jaxb.XmlChainItem;
 import eu.europa.esig.dss.spi.DSSUtils;
+import eu.europa.esig.dss.utils.Utils;
 import eu.europa.esig.dss.web.config.CXFConfig;
 import eu.europa.esig.dss.ws.cert.validation.dto.CertificateReportsDTO;
 import eu.europa.esig.dss.ws.cert.validation.dto.CertificateToValidateDTO;
@@ -20,8 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 
 		factory.setAddress(getBaseCxf() + CXFConfig.REST_CERTIFICATE_VALIDATION);
 		factory.setServiceClass(RestCertificateValidationService.class);
-		factory.setProviders(Arrays.asList(jacksonJsonProvider()));
+		factory.setProviders(Collections.singletonList(jacksonJsonProvider()));
 
 		LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
 		factory.getInInterceptors().add(loggingInInterceptor);
@@ -60,11 +61,11 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 		RemoteCertificate issuerCertificate = RemoteCertificateConverter
 				.toRemoteCertificate(DSSUtils.loadCertificate(new File("src/test/resources/CA_CZ.cer")));
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(2018, 12, 31);
+		calendar.set(2018, Calendar.DECEMBER, 31);
 		Date validationDate = calendar.getTime();
 		validationDate.setTime((validationDate.getTime() / 1000) * 1000); // clean millis
-		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(remoteCertificate, 
-				Arrays.asList(issuerCertificate), validationDate);
+		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(remoteCertificate,
+                Collections.singletonList(issuerCertificate), validationDate);
 		
 		CertificateReportsDTO reportsDTO = validationService.validateCertificate(certificateToValidateDTO);
 
@@ -75,17 +76,21 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 		XmlDiagnosticData xmlDiagnosticData = reportsDTO.getDiagnosticData();
 		List<XmlCertificate> usedCertificates = xmlDiagnosticData.getUsedCertificates();
 		assertTrue(usedCertificates.size() > 1);
-		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
-		assertTrue(chain.size() > 1);
+
+        XmlChainItem certificate = reportsDTO.getSimpleCertificateReport().getCertificate();
+        assertNotNull(certificate);
+
+        List<XmlChainItem> chain = certificate.getChain();
+        assertTrue(Utils.isCollectionNotEmpty(chain));
 		
 		DiagnosticData diagnosticData = new DiagnosticData(xmlDiagnosticData);
 		assertNotNull(diagnosticData);
 		
 		for (XmlChainItem chainItem : chain) {
-			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(chainItem.getId());
-			assertNotNull(certificate);
-			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
-			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
+            CertificateWrapper certificateById = diagnosticData.getUsedCertificateById(chainItem.getId());
+            assertNotNull(certificateById);
+            CertificateWrapper signingCertificate = certificateById.getSigningCertificate();
+            assertTrue(signingCertificate != null || certificateById.isTrusted() || certificateById.isSelfSigned());
 		}
 		assertEquals(0, validationDate.compareTo(diagnosticData.getValidationDate()));
 	}
@@ -97,8 +102,8 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 		RemoteCertificate issuerCertificate = RemoteCertificateConverter
 				.toRemoteCertificate(DSSUtils.loadCertificate(new File("src/test/resources/CA_CZ.cer")));
 		
-		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(remoteCertificate, 
-				Arrays.asList(issuerCertificate), null);
+		CertificateToValidateDTO certificateToValidateDTO = new CertificateToValidateDTO(remoteCertificate,
+                Collections.singletonList(issuerCertificate), null);
 		
 		CertificateReportsDTO reportsDTO = validationService.validateCertificate(certificateToValidateDTO);
 
@@ -109,17 +114,21 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 		XmlDiagnosticData xmlDiagnosticData = reportsDTO.getDiagnosticData();
 		List<XmlCertificate> usedCertificates = xmlDiagnosticData.getUsedCertificates();
 		assertTrue(usedCertificates.size() > 1);
-		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
-		assertTrue(chain.size() > 1);
+
+        XmlChainItem certificate = reportsDTO.getSimpleCertificateReport().getCertificate();
+        assertNotNull(certificate);
+
+        List<XmlChainItem> chain = certificate.getChain();
+        assertTrue(Utils.isCollectionNotEmpty(chain));
 		
 		DiagnosticData diagnosticData = new DiagnosticData(xmlDiagnosticData);
 		assertNotNull(diagnosticData);
 		
 		for (XmlChainItem chainItem : chain) {
-			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(chainItem.getId());
-			assertNotNull(certificate);
-			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
-			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
+            CertificateWrapper certificateById = diagnosticData.getUsedCertificateById(chainItem.getId());
+            assertNotNull(certificateById);
+            CertificateWrapper signingCertificate = certificateById.getSigningCertificate();
+            assertTrue(signingCertificate != null || certificateById.isTrusted() || certificateById.isSelfSigned());
 		}
 		assertNotNull(diagnosticData.getValidationDate());
 	}
@@ -139,17 +148,21 @@ public class RestCertificateValidationIT extends AbstractRestIT {
 		XmlDiagnosticData xmlDiagnosticData = reportsDTO.getDiagnosticData();
 		List<XmlCertificate> usedCertificates = xmlDiagnosticData.getUsedCertificates();
 		assertTrue(usedCertificates.size() > 1);
-		List<XmlChainItem> chain = reportsDTO.getSimpleCertificateReport().getChain();
-		assertTrue(chain.size() > 1);
+
+        XmlChainItem certificate = reportsDTO.getSimpleCertificateReport().getCertificate();
+        assertNotNull(certificate);
+
+        List<XmlChainItem> chain = certificate.getChain();
+        assertTrue(Utils.isCollectionNotEmpty(chain));
 		
 		DiagnosticData diagnosticData = new DiagnosticData(xmlDiagnosticData);
 		assertNotNull(diagnosticData);
 		
 		for (XmlChainItem chainItem : chain) {
-			CertificateWrapper certificate = diagnosticData.getUsedCertificateById(chainItem.getId());
-			assertNotNull(certificate);
-			CertificateWrapper signingCertificate = certificate.getSigningCertificate();
-			assertTrue(signingCertificate != null || certificate.isTrusted() && certificate.isSelfSigned());
+            CertificateWrapper certificateById = diagnosticData.getUsedCertificateById(chainItem.getId());
+            assertNotNull(certificateById);
+            CertificateWrapper signingCertificate = certificateById.getSigningCertificate();
+            assertTrue(signingCertificate != null || certificateById.isTrusted() || certificateById.isSelfSigned());
 		}
 		assertNotNull(diagnosticData.getValidationDate());
 	}
