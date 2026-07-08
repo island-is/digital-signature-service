@@ -64,6 +64,7 @@ jobs:
               with:
                     ssh-key: ${{ secrets.SSH_KEY }}
                     files: "charts/values.dev.yaml"
+                    message: ${{ steps.gettag.outputs.COMMIT_MESSAGE }}
                     branch: main
             - name: Upload prod manifest
               if: ${{ steps.gettag.outputs.PROD_DEPLOY == 'true' }}
@@ -71,6 +72,7 @@ jobs:
               with:
                 ssh-key: ${{ secrets.SSH_KEY }}
                 files: "charts/values.prod.yaml,charts/values.staging.yaml"
+                message: ${{ steps.gettag.outputs.COMMIT_MESSAGE }}
                 branch: release
             - name: Move cache
               run: |
