@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.13</version>
+		<version>4.1.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -22,13 +22,6 @@
 		<developer>
 			<id>naramski</id>
 			<name>David Naramski</name>
-			<roles>
-				<role>developer</role>
-			</roles>
-		</developer>
-		<developer>
-			<id>vandenbroucke</id>
-			<name>Pierrick Vandenbroucke</name>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -54,7 +47,7 @@
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
 		<logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
-		<cxf.version>4.2.0</cxf.version>
+		<cxf.version>4.2.3</cxf.version>
 		<jackson-jakarta-rs-json-provider.version>2.21.2</jackson-jakarta-rs-json-provider.version>
 		<commons-io.version>2.21.0</commons-io.version>
 		<hikaricp.version>7.0.2</hikaricp.version>
@@ -249,12 +242,6 @@
 		<dependency>
 			<groupId>nz.net.ultraq.thymeleaf</groupId>
 			<artifactId>thymeleaf-layout-dialect</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.8.17</version>
 		</dependency>
 
 		<!-- DSS Core dependencies -->
