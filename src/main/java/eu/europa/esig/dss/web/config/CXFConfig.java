@@ -21,6 +21,7 @@ import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -129,6 +130,12 @@ public class CXFConfig {
         openApiFeature.setTitle("DSS WebServices");
 		openApiFeature.setVersion(dssVersion);
         openApiFeature.setResourceClasses(Collections.singleton(resourcesClassName));
+
+        SwaggerUiConfig swaggerUiConfig = new SwaggerUiConfig();
+        swaggerUiConfig.setUrl("./openapi.json");
+        swaggerUiConfig.setQueryConfigEnabled(false);
+        openApiFeature.setSwaggerUiConfig(swaggerUiConfig);
+
         return openApiFeature;
     }
 
