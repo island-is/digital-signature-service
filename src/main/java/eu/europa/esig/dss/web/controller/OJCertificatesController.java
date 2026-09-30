@@ -1,7 +1,7 @@
 package eu.europa.esig.dss.web.controller;
 
 import eu.europa.esig.dss.model.tsl.LOTLInfo;
-import eu.europa.esig.dss.model.tsl.ParsingInfoRecord;
+import eu.europa.esig.dss.model.tsl.TLParsingInfoRecord;
 import eu.europa.esig.dss.model.tsl.TLValidationJobSummary;
 import eu.europa.esig.dss.spi.tsl.TrustedListsCertificateSource;
 import eu.europa.esig.dss.tsl.function.OfficialJournalSchemeInformationURI;
@@ -64,7 +64,7 @@ public class OJCertificatesController {
 			List<LOTLInfo> lotlInfos = summary.getLOTLInfos();
 			for (LOTLInfo lotlInfo : lotlInfos) {
 				if (Utils.areStringsEqual(lotlSource.getUrl(), lotlInfo.getUrl())) {
-					ParsingInfoRecord parsingCacheInfo = lotlInfo.getParsingCacheInfo();
+					TLParsingInfoRecord parsingCacheInfo = lotlInfo.getParsingCacheInfo();
 					if (parsingCacheInfo != null) {
 						return parsingCacheInfo.getSigningCertificateAnnouncementUrl();
 					}

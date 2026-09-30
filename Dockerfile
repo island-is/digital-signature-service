@@ -1,12 +1,12 @@
 # First stage: build the application with maven
-FROM maven:3.9.14-eclipse-temurin-21 AS build
+FROM maven:3.9.16-eclipse-temurin-25 AS build
 
 COPY . /home/island-is/app
 WORKDIR /home/island-is/app
 RUN mvn package -P quick
 
 # Second stage: create and run JAVA app
-FROM eclipse-temurin:21
+FROM eclipse-temurin:25
 
 RUN useradd -m island-is -d /home/island-is
 WORKDIR /home/island-is/app

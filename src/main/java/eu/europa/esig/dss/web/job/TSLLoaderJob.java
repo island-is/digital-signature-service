@@ -39,9 +39,11 @@ public class TSLLoaderJob {
 	@PostConstruct
 	public void init() {
 		if (Utils.isStringNotEmpty(bcRsaValidation)) {
+            LOG.info("Set org.bouncycastle.rsa.max_mr_tests : {}", bcRsaValidation);
 			System.setProperty("org.bouncycastle.rsa.max_mr_tests", bcRsaValidation);
 		}
 		if (Utils.isStringNotEmpty(xmlsecManifestMaxRefsCount)) {
+            LOG.info("Set org.apache.xml.security.maxReferences : {}", xmlsecManifestMaxRefsCount);
 			System.setProperty("org.apache.xml.security.maxReferences", xmlsecManifestMaxRefsCount);
 		}
         if (Utils.isStringNotEmpty(securityProvider)) {

@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.13</version>
+		<version>4.1.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 	<artifactId>dss-demos</artifactId>
-	<version>6.4</version>
+	<version>6.5</version>
 	<packaging>jar</packaging>
 
 	<name>Digital Island - Digital Signature Services</name>
@@ -22,13 +22,6 @@
 		<developer>
 			<id>naramski</id>
 			<name>David Naramski</name>
-			<roles>
-				<role>developer</role>
-			</roles>
-		</developer>
-		<developer>
-			<id>vandenbroucke</id>
-			<name>Pierrick Vandenbroucke</name>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -50,15 +43,16 @@
 		<!-- 	/root-folder/ -->
 		<!-- 	/root-folder/dss/... -->
 		<!-- 	/root-folder/dss-demos/... -->
-		<dss.version>6.4</dss.version>
+		<dss.version>6.5</dss.version>
 		<dss.framework.root.directory>${project.parent.basedir}/../dss</dss.framework.root.directory>
 
-		<logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
-		<cxf.version>4.2.0</cxf.version>
-		<jackson-jakarta-rs-json-provider.version>2.21.2</jackson-jakarta-rs-json-provider.version>
-		<commons-io.version>2.21.0</commons-io.version>
-		<hikaricp.version>7.0.2</hikaricp.version>
-		<freemarker.version>2.3.34</freemarker.version>
+		<logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
+		<cxf.version>4.2.3</cxf.version>
+        <swagger-ui.version>5.32.15</swagger-ui.version>
+		<jackson-jakarta-rs-json-provider.version>2.22.3</jackson-jakarta-rs-json-provider.version>
+		<commons-io.version>2.22.0</commons-io.version>
+		<hikaricp.version>7.1.0</hikaricp.version>
+		<freemarker.version>2.3.35</freemarker.version>
 		<hsqldb.version>2.7.4</hsqldb.version>
 		<fop-core.version>2.11</fop-core.version>
 	</properties>
@@ -81,9 +75,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<executable>true</executable>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -97,7 +88,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.6.2</version>
+				<version>3.6.3</version>
 				<executions>
 					<execution>
 						<id>enforce</id>
@@ -136,7 +127,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.15.0</version>
+					<version>3.16.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -146,7 +137,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
-					<version>3.1.4</version>
+					<version>3.2.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -168,7 +159,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.5.0</version>
+					<version>3.5.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -202,7 +193,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.5.5</version>
+					<version>3.6.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -210,6 +201,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>6.1.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>eu.europa.ec.joinup.sd-dss</groupId>
                 <artifactId>dss-bom</artifactId>
@@ -249,12 +247,6 @@
 		<dependency>
 			<groupId>nz.net.ultraq.thymeleaf</groupId>
 			<artifactId>thymeleaf-layout-dialect</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.8.17</version>
 		</dependency>
 
 		<!-- DSS Core dependencies -->
@@ -444,6 +436,12 @@
 			<version>${freemarker.version}</version>
 		</dependency>
 
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>swagger-ui</artifactId>
+            <version>${swagger-ui.version}</version>
+        </dependency>
+
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>fop-core</artifactId>
@@ -471,20 +469,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-
-        <!-- Temporary bump while spring-boot 3.5.x uses a commons-lang3 version 3.17.0 with a vulnerability -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.20.0</version>
-        </dependency>
-        <!-- Temporary bump while spring-boot 3.5.x uses a log4j-api version 2.24.3 with a vulnerability -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.25.4</version>
-        </dependency>
 
 		<!-- logback -->
 		<dependency>
@@ -520,11 +504,38 @@
 			<version>11.11.1</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <!-- Temporary bumps -->
+
+        <!-- sKema uses kotlin-stdlib v2.3.10. See https://nvd.nist.gov/vuln/detail/cve-2026-53914 -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>2.4.20</version>
+        </dependency>
+        <!-- Spring-boot 4.x uses tomcat-embed-core v11.0.24 -->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>11.0.26</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-websocket</artifactId>
+            <version>11.0.26</version>
+        </dependency>
+        <!-- CXF uses neethi v3.2.3 containing a number of vulnerabilities -->
+        <dependency>
+            <groupId>org.apache.neethi</groupId>
+            <artifactId>neethi</artifactId>
+            <version>3.2.4</version>
+        </dependency>
+
+        <!-- TEST dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
@@ -570,7 +581,10 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>12.1.9</version>
+						<version>12.2.2</version>
+                        <configuration>
+                            <yarnAuditAnalyzerEnabled>false</yarnAuditAnalyzerEnabled>
+                        </configuration>
 						<executions>
 							<execution>
 								<goals>
@@ -596,7 +610,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
-						<version>3.5.5</version>
+						<version>3.6.0</version>
 						<executions>
 							<execution>
 								<goals>
